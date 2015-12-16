@@ -16,14 +16,14 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Jonas on 2015/11/22.
  */
-public class NetworkManager {
+public class OkhttpManager {
 
     public OkHttpClient client;
     private Gson gson;
-    private static NetworkManager sNetworkManager;
+    private static OkhttpManager sNetworkManager;
 
 
-    private NetworkManager(){
+    private OkhttpManager(){
         client = new OkHttpClient();
         client.setConnectTimeout(5, TimeUnit.SECONDS);
         client.setReadTimeout(5, TimeUnit.SECONDS);
@@ -33,11 +33,11 @@ public class NetworkManager {
         client.setCache(mCache);
     }
 
-    public static NetworkManager getInstance(){
+    public static OkhttpManager getInstance(){
         if(sNetworkManager == null) {
-            synchronized(NetworkManager.class) {
+            synchronized(OkhttpManager.class) {
                 if(sNetworkManager == null) {
-                    sNetworkManager = new NetworkManager();
+                    sNetworkManager = new OkhttpManager();
                 }
             }
         }
@@ -58,7 +58,14 @@ public class NetworkManager {
         });
     }
 
-    public <T> void request(Request r, final NetResult result, final Class<T> aClass){
+    /**
+     * 将返回的数据封装成 对象
+     * @param r
+     * @param result
+     * @param aClass
+     * @param <T>  返回的对象
+     */
+    public <T> void requestObject(Request r, final NetResult<Request,T> result, final Class<T> aClass){
         client.newCall(r).enqueue(new Callback() {
             @Override
             public void onFailure(Request request, IOException e){
