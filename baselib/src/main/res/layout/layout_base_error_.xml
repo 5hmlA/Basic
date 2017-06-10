@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:gravity="center"
+              android:layout_height="match_parent">
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"/>
+    <!--去掉Button悬浮阴影  style="?android:attr/borderlessButtonStyle"-->
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textAllCaps="false"
+        android:text="@string/layout_basestate_retry"/>
+    <CheckedTextView
+        android:layout_width="350dp"
+        android:text="将住宿地方加速的积分"
+        android:textAlignment="gravity"
+        android:gravity="center"
+        android:background="#fcf"
+        android:layout_height="50dp"/>
+
+    <!--seekbar在Lollipop上自定义thumb的适配问题 透明无效 android:splitTrack="false"-->
+    <!--The Material seek bar has split track enabled by default. You need to turn it off.-->
+    <!--http://stackoverflow.com/questions/26989400/custom-seekbar-thumb-not-transparent-on-lollipop-api21-->
+    <!--<SeekBar-->
+        <!--android:id="@+id/seek1"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_margin="10dp"-->
+        <!--android:splitTrack="false"-->
+        <!--android:progressDrawable="@drawable/style_progressbar"-->
+        <!--android:thumb="@drawable/style_progressbar_circle"-->
+        <!--android:progress="20" />-->
+
+</LinearLayout>

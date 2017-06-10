@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="titles_sec_workshop">
+        <item>推荐</item>
+        <item>专题</item>
+        <item>联机</item>
+        <item>玩家</item>
+        <item>材质包</item>
+    </string-array>
+
+    <string-array name="titles_home_buttom">
+        <item>工坊</item>
+        <item>攻略</item>
+        <item>直播</item>
+        <item>我</item>
+    </string-array>
+
+    <string-array name="titles_sec_raiders">
+        <item>小编推荐</item>
+        <item>攻略心得</item>
+        <item>游戏教程</item>
+        <item>新闻资讯</item>
+        <item>图鉴/合成</item>
+        <item>游戏问答</item>
+    </string-array>
+    <string-array name="titles_sec_live">
+        <item>直播实况</item>
+        <item>视频推荐</item>
+    </string-array>
+
+</resources>

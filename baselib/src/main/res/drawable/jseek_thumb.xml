@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_enabled="false">
+        <nine-patch android:src="@drawable/jthumb_volume_disable"
+                    android:gravity="center"/>
+    </item>
+    <item>
+        <nine-patch android:src="@drawable/jthumb_volume_normal"
+                    android:gravity="center"/>
+    </item>
+</selector>

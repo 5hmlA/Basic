@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true" android:drawable="@color/jforground_trans_gray"/>
+    <!--5.0 以下找不到-->
+    <!--<item android:state_pressed="true" android:color="?attr/colorControlHighlight"/>-->
+    <item android:drawable="@android:color/transparent"/>
+</selector>

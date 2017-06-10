@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+    <SeekBar
+        android:id="@+id/sug_coach_set_pb_count"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:maxHeight="5dp"
+        android:progressDrawable="@drawable/jseekbar_prog"
+        android:splitTrack="false"
+        android:thumb="@drawable/jseek_thumb"/>
+
+    <RadioGroup
+        android:id="@+id/sug_rg_train_event_tab"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#ffe2edf1"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/sug_train_event_week"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/selector_jradiobutton_bg"
+            android:button="@null"
+            android:checked="true"
+            android:gravity="center"
+            android:text="LEFT"
+            android:textColor="@drawable/selector_jradiobutton_tv_color"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <RadioButton
+            android:id="@+id/sug_train_event_month"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/selector_jradiobutton_bg"
+            android:button="@null"
+            android:gravity="center"
+            android:text="MIDDLE"
+            android:textColor="@drawable/selector_jradiobutton_tv_color"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <RadioButton
+            android:id="@+id/sug_train_event_total"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/selector_jradiobutton_bg"
+            android:button="@null"
+            android:gravity="center"
+            android:text="RIGHT"
+            android:textColor="@drawable/selector_jradiobutton_tv_color"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+    </RadioGroup>
+
+</LinearLayout>

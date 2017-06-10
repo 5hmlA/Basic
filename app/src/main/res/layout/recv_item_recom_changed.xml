@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:padding="16dp"
+              android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tv_recv_recom_change_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="精选热门"/>
+
+        <Button
+            android:id="@+id/btn_recv_recom_change_next"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_width="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_height="wrap_content"
+            android:text="@string/item_change_next"/>
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dip"
+        android:background="@color/background_tab_pressed"/>
+
+    <include
+        android:id="@+id/lay_recv_first"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        layout="@layout/recv_common_item_itb"/>
+
+    <include
+        android:id="@+id/lay_recv_sec"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        layout="@layout/recv_common_item_itb"/>
+
+</LinearLayout>

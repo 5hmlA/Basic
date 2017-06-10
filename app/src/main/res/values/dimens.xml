@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="tab_textsize">11sp</dimen>
+    <dimen name="tab_top_textsize">18sp</dimen>
+    <dimen name="tab_pading">8dp</dimen>
+</resources>

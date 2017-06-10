@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ForegroundImageView">
+        <attr name="android:foreground"/>
+    </declare-styleable>
+
+    <declare-styleable name="jtitlebar">
+        <attr name="leftIcon" format="reference"/>
+        <attr name="rightIcon" format="reference"/>
+        <attr name="textSize" format="dimension"/>
+        <attr name="textColor" format="reference"/>
+        <attr name="text" format="string"/>
+        <attr name="fitsSystemWindows" format="boolean"/>
+    </declare-styleable>
+</resources>
