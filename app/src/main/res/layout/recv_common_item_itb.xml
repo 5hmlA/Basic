@@ -3,6 +3,8 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:animateLayoutChanges="true"
+                android:layoutAnimation="@anim/layaniscalecenter"
                 android:gravity="center_vertical">
 
     <ImageView
@@ -24,6 +26,8 @@
 
     <LinearLayout
         android:id="@+id/common_middle"
+        android:animateLayoutChanges="true"
+        android:layoutAnimation="@anim/layaniscalecenter"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_toEndOf="@+id/im_recv_common_icon"

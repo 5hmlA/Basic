@@ -5,9 +5,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:layoutAnimation="@anim/layanipushdown"
     android:orientation="vertical">
 
-    <com.baselib.widget.JViewPager
+    <com.blueprint.widget.JViewPager
         android:id="@+id/main_tab_pager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -16,6 +18,8 @@
 
     <april.yun.JPagerSlidingTabStrip
         android:id="@+id/main_tab_buttom_strip"
+        android:animateLayoutChanges="true"
+        android:layoutAnimation="@anim/layaniscalecenter"
         android:layout_width="match_parent"
         android:padding="3dp"
         android:layout_height="50dp"/>

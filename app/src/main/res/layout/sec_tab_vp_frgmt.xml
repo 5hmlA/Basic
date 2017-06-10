@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+       android:layout_width="match_parent"
+       android:layout_height="match_parent">
 
     <april.yun.JPagerSlidingTabStrip
         android:id="@+id/sec_tab_strip"
@@ -10,8 +10,8 @@
 
     <android.support.v4.view.ViewPager
         android:id="@+id/sec_viewpager"
-        android:layout_below="@+id/sec_tab_strip"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_below="@+id/sec_tab_strip"/>
 
 </merge>

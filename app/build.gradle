@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply from: 'https://raw.githubusercontent.com/ZuYun/workspace/master/config.gradle'
 
 android {
     compileSdkVersion config.compileSdkVersion
@@ -9,7 +10,7 @@ android {
         targetSdkVersion config.targetSdkVersion
         versionCode config.versionCode
         versionName config.versionName
-        applicationId "com.a4399.miniworld"
+        applicationId "com.jonas.blueprint"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         buildConfigField "String", "APP_BASE_URL", "\"http://gank.io/api/data/\""

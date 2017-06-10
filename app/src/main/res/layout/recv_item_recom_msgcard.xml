@@ -4,6 +4,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="16dp"
+                android:layoutAnimation="@anim/layleftin"
                 android:gravity="center_vertical">
 
     <ImageView
@@ -26,6 +27,7 @@
     <LinearLayout
         android:id="@+id/recom_middle"
         android:layout_width="match_parent"
+        android:layoutAnimation="@anim/layanipushup"
         android:layout_height="match_parent"
         android:layout_toEndOf="@+id/im_recv_recom_adv_icon"
         android:layout_toLeftOf="@+id/btn_recv_recom_adv"

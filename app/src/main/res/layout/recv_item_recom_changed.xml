@@ -8,6 +8,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
+        android:animateLayoutChanges="true"
+        android:layoutAnimation="@anim/layanipushup"
         android:layout_height="wrap_content">
 
         <TextView
