@@ -20,6 +20,7 @@ public class LibApp {
     private static final String TAG = LibApp.class.getSimpleName();
 
     private static Context sContext;
+    private static boolean sInDebug;
 
     public static void init(Context context){
         sContext = context.getApplicationContext();
@@ -98,6 +99,26 @@ public class LibApp {
     public static void setImageSrc(@NonNull View rootView, int id, int resStr){
         if(!TextUtils.isEmpty(findString(resStr)) && CheckHelper.checkObjects(rootView.findViewById(id))) {
             ( (ImageView)rootView.findViewById(id) ).setImageResource(resStr);
+        }
+    }
+
+    public static void setDebugConfig(boolean inDebug){
+        sInDebug = inDebug;
+    }
+
+    public static boolean isInDebug(){
+        return sInDebug;
+    }
+
+    public static void slog_d(String tag, String msg){
+        if(sInDebug) {
+            Log.d(tag, msg);
+        }
+    }
+
+    public static void slog_e(String tag, String msg){
+        if(sInDebug) {
+            Log.e(tag, msg);
         }
     }
 }

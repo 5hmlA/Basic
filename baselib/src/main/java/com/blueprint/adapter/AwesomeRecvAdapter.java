@@ -20,6 +20,9 @@ import android.widget.TextView;
 import java.util.Collections;
 import java.util.List;
 
+import static com.blueprint.LibApp.slog_d;
+import static com.blueprint.LibApp.slog_e;
+
 /**
  * @des [recycleview适配器 基类，上拉加载更多,多类型布局,拖拽,滑动删除 支持]
  */
@@ -214,7 +217,7 @@ public abstract class AwesomeRecvAdapter<T> extends RecyclerView.Adapter<Recycle
      */
     public AwesomeRecvAdapter setPagesize(int pagesize){
         if(mData.size()<pagesize) {
-            Log.d(TAG, "mData.size() < pagesize 不显示上拉加载状态");
+            slog_d(TAG, "mData.size() < pagesize 不显示上拉加载状态");
         }
         this.PAGESIZE = pagesize;
         return this;
@@ -226,7 +229,7 @@ public abstract class AwesomeRecvAdapter<T> extends RecyclerView.Adapter<Recycle
             String s = mContext.getString(com.blueprint.R.string.jonas_recyc_loading_more);
             if(s.equals(
                     ( (TextView)mLoadingHolder.getView(com.blueprint.R.id.recyc_item_tv_loadmore) ).getText().toString().trim())) {
-                Log.d(TAG, "点击加载更多");
+                slog_d(TAG, "点击加载更多");
                 mLoadingHolder
                         .setText(com.blueprint.R.id.recyc_item_tv_loadmore, mContext.getString(com.blueprint.R.string.jonas_recyc_loading_more));
                 if(mListener != null && mLoadmoreitem == 1) {
@@ -281,14 +284,14 @@ public abstract class AwesomeRecvAdapter<T> extends RecyclerView.Adapter<Recycle
                 notifyItemRemoved(position);
             }
         }else {
-            Log.e(TAG, "position out of bounde of mData.size()");
+            slog_e(TAG,"position out of bounde of mData.size()");
         }
     }
 
 
     public void addItem(T data, int position){
         if(position>mData.size()) {
-            Log.e(TAG, position+" > mData.size():"+mData.size());
+            slog_e(TAG,position+" > mData.size():"+mData.size());
             return;
         }
         mData.add(position, data);
@@ -332,7 +335,7 @@ public abstract class AwesomeRecvAdapter<T> extends RecyclerView.Adapter<Recycle
     @Override
     public void clearView(RecyclerView.ViewHolder viewHolder){
         if(mLoadingHolder == viewHolder) {
-            Log.e(TAG, "上拉加载提示holder不可以拖动滑动 ");
+            slog_e(TAG, "上拉加载提示holder不可以拖动滑动 ");
             return;
         }
         if(viewHolder.itemView.getTag() != null) {

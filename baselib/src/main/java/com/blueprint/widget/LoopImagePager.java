@@ -8,10 +8,8 @@ import android.os.Build;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -27,10 +25,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 
+import static com.blueprint.LibApp.slog_d;
+
 /**
  * @author 江祖赟.
  * @date 2017/6/7
- * @des [rxjava实现自动滚动轮播图，控件可见重启，不可见关闭滚动]
+ * @des [rxjava实现自动滚动轮播图，控件可见重启滾動，不可见关闭滚动]
  */
 public class LoopImagePager extends RelativeLayout {
     private static final String TAG = LoopImagePager.class.getSimpleName();
@@ -42,7 +42,7 @@ public class LoopImagePager extends RelativeLayout {
     private Rect mVisibleRect = new Rect();
     private boolean mMove;
     private PointF mLastMoved = new PointF();
-    private int mTapSlop;
+    private int mCurrentPosition = 20;
 
     public LoopImagePager(Context context){
         this(context, null);
@@ -56,7 +56,6 @@ public class LoopImagePager extends RelativeLayout {
         super(context, attrs, defStyleAttr);
         setWillNotDraw(false);
         mViewPager = new ViewPager(context);
-        mTapSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
         setClipChildren(false);
         LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         layoutParams.leftMargin = (int)DpHelper.dp2px(20);
@@ -87,14 +86,15 @@ public class LoopImagePager extends RelativeLayout {
 
     private void startLoop(){
         if(mSubscribe == null || mSubscribe.isDisposed()) {
-            Log.d(TAG, "start loop ==============");
+            slog_d(TAG, "start loop ==============");
             mSubscribe = Observable.interval(LOOPINTERVAL, TimeUnit.SECONDS).observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Consumer<Long>() {
                         @Override
                         public void accept(Long aLong) throws Exception{
+                           //并不是立刻執行
                             if(getLocalVisibleRect(mVisibleRect)) {
                                 //可见
-                                mViewPager.setCurrentItem(mViewPager.getCurrentItem()+1);
+                                mViewPager.setCurrentItem(++mCurrentPosition);
                             }else {
                                 //取消自动loop
                                 stopLoop();
@@ -106,7 +106,8 @@ public class LoopImagePager extends RelativeLayout {
 
     private void stopLoop(){
         if(mSubscribe != null) {
-            Log.d(TAG, "stop auto loop ==============");
+            slog_d(TAG, "stop auto loop ==============");
+            mCurrentPosition = mViewPager.getCurrentItem();
             mSubscribe.dispose();
         }
     }
@@ -119,7 +120,7 @@ public class LoopImagePager extends RelativeLayout {
     public LoopImagePager setPagerData(List<String> pagerData){
         mAdapter = new ImagePagerAdapter(pagerData);
         mViewPager.setAdapter(mAdapter);
-        mViewPager.setCurrentItem(20);
+        mViewPager.setCurrentItem(mCurrentPosition);
         if(mL != null) {
             mAdapter.setOnitemClickListener(mL);
         }
@@ -141,13 +142,13 @@ public class LoopImagePager extends RelativeLayout {
                     //down的时候关了
                     startLoop();
                 }else {
-                    Log.d(TAG, "move");
+                    slog_d(TAG, "move");
                     mMove = true;
                     stopLoop();
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                Log.d(TAG, "up");
+                slog_d(TAG, "up");
                 mMove = false;
                 startLoop();
                 break;

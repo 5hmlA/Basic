@@ -15,6 +15,7 @@ public class JApp extends Application {
     public void onCreate(){
         super.onCreate();
         LibApp.init(this);
+        LibApp.setDebugConfig(BuildConfig.DEBUG);
         if (LeakCanary.isInAnalyzerProcess(this)) {
             return;
         }

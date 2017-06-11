@@ -1,6 +1,7 @@
 package com.blueprint.adapter;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.GridLayoutManager;
@@ -14,10 +15,11 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.blueprint.BuildConfig;
-
 import java.util.Collections;
 import java.util.List;
+
+import static com.blueprint.LibApp.slog_d;
+import static com.blueprint.LibApp.slog_e;
 
 /**
  * @des [recycleview适配器 基类，上拉加载更多,多类型布局,拖拽,滑动删除 支持]
@@ -41,9 +43,10 @@ public abstract class AwesCardRecvAdapter<T> extends RecyclerView.Adapter<Recycl
 
     /**
      * 多布局模式 不支持上拉加载更多
+     *
      * @param awesCards
      */
-    public AwesCardRecvAdapter(@NonNull List<BaseAwesCard> awesCards) {
+    public AwesCardRecvAdapter(@NonNull List<BaseAwesCard> awesCards){
         mLoadmoreitem = 0;
         mAwesCards = awesCards;
     }
@@ -55,20 +58,20 @@ public abstract class AwesCardRecvAdapter<T> extends RecyclerView.Adapter<Recycl
      * @param awesCards
      * @param recv
      */
-    public AwesCardRecvAdapter(@NonNull List<BaseAwesCard> awesCards, @NonNull final RecyclerView recv) {
+    public AwesCardRecvAdapter(@NonNull List<BaseAwesCard> awesCards, @NonNull final RecyclerView recv){
         mAwesCards = awesCards;
         loadMoreInit(recv);
     }
 
-    private void loadMoreInit( @NonNull final RecyclerView recv) {
+    private void loadMoreInit(@NonNull final RecyclerView recv){
         mContext = recv.getContext();
         setSpanCount(recv);
         recv.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy){
                 super.onScrolled(recyclerView, dx, dy);
-                if (!ViewCompat.canScrollVertically(recv, 1) && mLoadmoreitem == 1) {
-                    if (mListener != null) {
+                if(!ViewCompat.canScrollVertically(recv, 1) && mLoadmoreitem == 1) {
+                    if(mListener != null) {
                         mListener.onLoadingMore();
                     }
                 }
@@ -76,68 +79,73 @@ public abstract class AwesCardRecvAdapter<T> extends RecyclerView.Adapter<Recycl
         });
     }
 
-    private void setSpanCount(RecyclerView recv) {
+    private void setSpanCount(RecyclerView recv){
         final RecyclerView.LayoutManager layoutManager = recv.getLayoutManager();
-        if (layoutManager != null) {
-            if (layoutManager instanceof StaggeredGridLayoutManager) {
-                mStaggeredGridLayoutManager = (StaggeredGridLayoutManager) layoutManager;
-            } else if (layoutManager instanceof GridLayoutManager) {
-                ((GridLayoutManager) layoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+        if(layoutManager != null) {
+            if(layoutManager instanceof StaggeredGridLayoutManager) {
+                mStaggeredGridLayoutManager = (StaggeredGridLayoutManager)layoutManager;
+            }else if(layoutManager instanceof GridLayoutManager) {
+                ( (GridLayoutManager)layoutManager ).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                     @Override
-                    public int getSpanSize(int position) {
-                        return ITEMTYPE_LOADMORE == getItemViewType(position) ? ((GridLayoutManager) layoutManager).getSpanCount() : 1;
+                    public int getSpanSize(int position){
+                        return ITEMTYPE_LOADMORE == getItemViewType(position) ? ( (GridLayoutManager)layoutManager )
+                                .getSpanCount() : 1;
                     }
                 });
             }
-        } else {
+        }else {
             Log.e(TAG, "LayoutManager 为空,请先设置 recycleView.setLayoutManager(...)");
         }
     }
 
     @Override
-    public int getItemCount() {
-        return mAwesCards.size() > PAGESIZE ? mAwesCards.size() + mLoadmoreitem : mAwesCards.size();
+    public int getItemCount(){
+        return mAwesCards.size()>PAGESIZE ? mAwesCards.size()+mLoadmoreitem : mAwesCards.size();
     }
 
     /**
      * 每个 position 都对应一个类型的card
+     *
      * @param position
      * @return
      */
     @Override
-    public final int getItemViewType(int position) {
-        if (position == mAwesCards.size()) {
+    public final int getItemViewType(int position){
+        if(position == mAwesCards.size()) {
             return ITEMTYPE_LOADMORE;
-        } else {
+        }else {
             return position;
         }
     }
 
     @Override
-    public RecyclerHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (mContext == null) {
+    public RecyclerHolder onCreateViewHolder(ViewGroup parent, int viewType){
+        if(mContext == null) {
             mContext = parent.getContext();
         }
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        if (viewType == ITEMTYPE_LOADMORE) {
-            mLoadingHolder = new RecyclerHolder(inflater.inflate(com.blueprint.R.layout.item_recyc_loading_more, parent, false));
+        if(viewType == ITEMTYPE_LOADMORE) {
+            mLoadingHolder = new RecyclerHolder(
+                    inflater.inflate(com.blueprint.R.layout.item_recyc_loading_more, parent, false));
             mLoadingHolder.setTag(TAG_LOADING);
-            if (mStaggeredGridLayoutManager != null) {
-                StaggeredGridLayoutManager.LayoutParams fullSpanLayoutparam = new StaggeredGridLayoutManager.LayoutParams(-1, -2);
+            if(mStaggeredGridLayoutManager != null) {
+                StaggeredGridLayoutManager.LayoutParams fullSpanLayoutparam = new StaggeredGridLayoutManager.LayoutParams(
+                        -1, -2);
                 fullSpanLayoutparam.setFullSpan(true);
-                ((LinearLayout) mLoadingHolder.getView(com.blueprint.R.id.recyc_item_tv_loadmore).getParent()).setLayoutParams(fullSpanLayoutparam);
+                ( (LinearLayout)mLoadingHolder.getView(com.blueprint.R.id.recyc_item_tv_loadmore).getParent() )
+                        .setLayoutParams(fullSpanLayoutparam);
             }
             mLoadingHolder.setOnClickListener(com.blueprint.R.id.recyc_item_tv_loadmore, this);
             return mLoadingHolder;
-        } else {
-           return mAwesCards.get(viewType).getRecyclerHolder(mContext);
+        }else {
+            return mAwesCards.get(viewType).getRecyclerHolder(mContext);
         }
     }
 
     @Override
-    public void onBindViewHolder(final RecyclerHolder holder, int position) {
-        if (position < mAwesCards.size()) {
-            mAwesCards.get(position).holderConvert(holder,position);
+    public void onBindViewHolder(final RecyclerHolder holder, int position){
+        if(position<mAwesCards.size()) {
+            mAwesCards.get(position).holderConvert(holder, position);
         }
     }
 
@@ -147,23 +155,25 @@ public abstract class AwesCardRecvAdapter<T> extends RecyclerView.Adapter<Recycl
      * @param pagesize
      * @return
      */
-    public AwesCardRecvAdapter setPagesize(int pagesize) {
-        if (mAwesCards.size() < pagesize) {
-            if (BuildConfig.DEBUG) Log.d(TAG, "mAwesCards.size() < pagesize 不显示上拉加载状态");
+    public AwesCardRecvAdapter setPagesize(int pagesize){
+        if(mAwesCards.size()<pagesize) {
+            slog_d(TAG, "mAwesCards.size() < pagesize 不显示上拉加载状态");
         }
         this.PAGESIZE = pagesize;
         return this;
     }
 
     @Override
-    public void onClick(View v) {
-        if (v.getId() == com.blueprint.R.id.recyc_item_tv_loadmore) {
+    public void onClick(View v){
+        if(v.getId() == com.blueprint.R.id.recyc_item_tv_loadmore) {
             String s = mContext.getString(com.blueprint.R.string.jonas_recyc_loading_more);
-            if (s.equals(((TextView) mLoadingHolder.getView(com.blueprint.R.id.recyc_item_tv_loadmore)).getText().toString().trim())) {
-                if (BuildConfig.DEBUG) Log.d(TAG, "点击加载更多");
-                mLoadingHolder.setText(
-                        com.blueprint.R.id.recyc_item_tv_loadmore, mContext.getString(com.blueprint.R.string.jonas_recyc_loading_more));
-                if (mListener != null && mLoadmoreitem == 1) {
+            if(s.equals(
+                    ( (TextView)mLoadingHolder.getView(com.blueprint.R.id.recyc_item_tv_loadmore) ).getText().toString()
+                            .trim())) {
+                slog_d(TAG, "点击加载更多");
+                mLoadingHolder.setText(com.blueprint.R.id.recyc_item_tv_loadmore,
+                        mContext.getString(com.blueprint.R.string.jonas_recyc_loading_more));
+                if(mListener != null && mLoadmoreitem == 1) {
                     mListener.onLoadingMore();
                 }
             }
@@ -173,8 +183,9 @@ public abstract class AwesCardRecvAdapter<T> extends RecyclerView.Adapter<Recycl
     /**
      * 外部手动调用 加载错误
      */
-    public AwesCardRecvAdapter loadError() {
-        mLoadingHolder.setText(com.blueprint.R.id.recyc_item_tv_loadmore, mContext.getString(com.blueprint.R.string.jonas_recyc_load_retry));
+    public AwesCardRecvAdapter loadError(){
+        mLoadingHolder.setText(com.blueprint.R.id.recyc_item_tv_loadmore,
+                mContext.getString(com.blueprint.R.string.jonas_recyc_load_retry));
         return this;
     }
 
@@ -183,7 +194,7 @@ public abstract class AwesCardRecvAdapter<T> extends RecyclerView.Adapter<Recycl
      *
      * @return
      */
-    public AwesCardRecvAdapter noMoreLoad() {
+    public AwesCardRecvAdapter noMoreLoad(){
         mLoadmoreitem = 0;
         notifyDataSetChanged();
         return this;
@@ -196,33 +207,33 @@ public abstract class AwesCardRecvAdapter<T> extends RecyclerView.Adapter<Recycl
         void onLoadingMore();
     }
 
-    public AwesCardRecvAdapter setOnMoreloadListener(OnMoreloadListener listener) {
+    public AwesCardRecvAdapter setOnMoreloadListener(OnMoreloadListener listener){
         mListener = listener;
         return this;
     }
 
-    public void notifyDataChange(@NonNull List<BaseAwesCard> data) {
+    public void notifyDataChange(@NonNull List<BaseAwesCard> data){
         mAwesCards.addAll(data);
         notifyDataSetChanged();
     }
 
-    public void removeItem(int position) {
-        if (position < mAwesCards.size()) {
+    public void removeItem(int position){
+        if(position<mAwesCards.size()) {
             mAwesCards.remove(position);
-            if (mAwesCards.size() == PAGESIZE && mLoadmoreitem == 1) {
+            if(mAwesCards.size() == PAGESIZE && mLoadmoreitem == 1) {
                 notifyDataSetChanged();
-            } else {
+            }else {
                 notifyItemRemoved(position);
             }
-        } else {
-            if (BuildConfig.DEBUG) Log.e(TAG, "position out of bounde of mAwesCards.size()");
+        }else {
+            slog_e(TAG, "position out of bounde of mAwesCards.size()");
         }
     }
 
 
-    public void addItem(BaseAwesCard data, int position) {
-        if (position > mAwesCards.size()) {
-            if (BuildConfig.DEBUG) Log.e(TAG, position + " > mAwesCards.size():" + mAwesCards.size());
+    public void addItem(BaseAwesCard data, int position){
+        if(position>mAwesCards.size()) {
+            slog_e(TAG, position+" > mAwesCards.size():"+mAwesCards.size());
             return;
         }
         mAwesCards.add(position, data);
@@ -230,16 +241,16 @@ public abstract class AwesCardRecvAdapter<T> extends RecyclerView.Adapter<Recycl
     }
 
     @Override
-    public void onItemMove(int fromPosition, int toPosition) {
-        if (fromPosition < mAwesCards.size() && toPosition < mAwesCards.size()) {
+    public void onItemMove(int fromPosition, int toPosition){
+        if(fromPosition<mAwesCards.size() && toPosition<mAwesCards.size()) {
             Collections.swap(mAwesCards, fromPosition, toPosition);
             notifyItemMoved(fromPosition, toPosition);
         }
     }
 
     @Override
-    public void onItemDismiss(int position) {
-        if (position < mAwesCards.size()) {
+    public void onItemDismiss(int position){
+        if(position<mAwesCards.size()) {
             removeItem(position);
         }
     }
@@ -248,27 +259,31 @@ public abstract class AwesCardRecvAdapter<T> extends RecyclerView.Adapter<Recycl
      * item的布局 嵌套一层 设置marging 用于添加阴影
      */
     @Override
-    public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
-        if (mLoadingHolder == viewHolder) {
-            if (BuildConfig.DEBUG) Log.e(TAG, "上拉加载提示holder不可以拖动滑动 ");
+    public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState){
+        if(mLoadingHolder == viewHolder) {
+            slog_e(TAG, "上拉加载提示holder不可以拖动滑动 ");
             return;
         }
-        if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
-            View child = ((ViewGroup) viewHolder.itemView).getChildAt(0);
-            viewHolder.itemView.setTag(child.getElevation());
-            child.setElevation(6);
+        if(actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+            View child = ( (ViewGroup)viewHolder.itemView ).getChildAt(0);
+            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
+                viewHolder.itemView.setTag(child.getElevation());
+                child.setElevation(6);
+            }
         }
     }
 
     @Override
-    public void clearView(RecyclerView.ViewHolder viewHolder) {
-        if (mLoadingHolder == viewHolder) {
-            if (BuildConfig.DEBUG) Log.e(TAG, "上拉加载提示holder不可以拖动滑动 ");
+    public void clearView(RecyclerView.ViewHolder viewHolder){
+        if(mLoadingHolder == viewHolder) {
+            slog_e(TAG, "上拉加载提示holder不可以拖动滑动 ");
             return;
         }
-        if (viewHolder.itemView.getTag() != null) {
-            View child = ((ViewGroup) viewHolder.itemView).getChildAt(0);
-            child.setElevation(((Float) viewHolder.itemView.getTag()));
+        if(viewHolder.itemView.getTag() != null) {
+            View child = ( (ViewGroup)viewHolder.itemView ).getChildAt(0);
+            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
+                child.setElevation(( (Float)viewHolder.itemView.getTag() ));
+            }
         }
     }
 }
