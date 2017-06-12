@@ -42,6 +42,7 @@ public abstract class LoadMoreWrapper extends RecyclerView.Adapter<RecyclerView.
      */
     private int mLoadmoreitem = 1;
     private StaggeredGridLayoutManager mStaggeredGridLayoutManager;
+    private boolean mInLoadingMore;
 
 
     /**
@@ -62,7 +63,8 @@ public abstract class LoadMoreWrapper extends RecyclerView.Adapter<RecyclerView.
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy){
                 super.onScrolled(recyclerView, dx, dy);
-                if(!ViewCompat.canScrollVertically(recyclerView, 1) && mLoadmoreitem == 1) {
+                if(!ViewCompat.canScrollVertically(recyclerView, 1) && mLoadmoreitem == 1 && !mInLoadingMore) {
+                    mInLoadingMore = true;
                     if(mListener != null) {
                         mListener.onLoadingMore();
                     }
@@ -138,7 +140,8 @@ public abstract class LoadMoreWrapper extends RecyclerView.Adapter<RecyclerView.
 
     @Override
     public void onClick(View v){
-        if(v.getId() == com.blueprint.R.id.recyc_item_tv_loadmore) {
+        if(v.getId() == com.blueprint.R.id.recyc_item_tv_loadmore && !mInLoadingMore) {
+            mInLoadingMore = true;
             //点击重试之后变成加载更多
             String s = mContext.getString(com.blueprint.R.string.jonas_recyc_loading_more);
             if(s.equals(
@@ -167,6 +170,7 @@ public abstract class LoadMoreWrapper extends RecyclerView.Adapter<RecyclerView.
     }
 
     public void notifyDataChange(@NonNull List<Object> data){
+        mInLoadingMore = false;
         mData.addAll(data);
         notifyDataSetChanged();
     }
@@ -186,6 +190,7 @@ public abstract class LoadMoreWrapper extends RecyclerView.Adapter<RecyclerView.
 
 
     public void addItem(Object data, int position){
+        mInLoadingMore = false;
         if(position>mData.size()) {
             slog_e(TAG, position+" > mData.size():"+mData.size());
             return;
