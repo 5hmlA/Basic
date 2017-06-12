@@ -1,6 +1,5 @@
 package com.blueprint.adapter;
 
-import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
@@ -20,6 +19,7 @@ import java.util.List;
 
 import me.drakeet.multitype.MultiTypeAdapter;
 
+import static com.blueprint.LibApp.findString;
 import static com.blueprint.helper.LogHelper.slog_d;
 import static com.blueprint.helper.LogHelper.slog_e;
 
@@ -35,7 +35,6 @@ public class LoadMoreWrapperAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     private final static String TAG = BaseRecvAdapter.class.getSimpleName();
     private MultiTypeAdapter mInnerAdapter;
     private List<Object> mData;
-    private Context mContext;
     private RecyclerHolder mLoadingHolder;
     private OnMoreloadListener mListener;
     private boolean mInLoadingMore;
@@ -53,13 +52,12 @@ public class LoadMoreWrapperAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     public LoadMoreWrapperAdapter(MultiTypeAdapter innerAdapter){
         mInnerAdapter = innerAdapter;
         mData = (List<Object>)mInnerAdapter.getItems();
+        mLoadmoreitem = enableUpMore() ? 1 : 0;
     }
-
 
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView){
         super.onAttachedToRecyclerView(recyclerView);
-        mContext = recyclerView.getContext();
         setSpanCount(recyclerView);
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -111,22 +109,22 @@ public class LoadMoreWrapperAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
-        if(mContext == null) {
-            mContext = parent.getContext();
-        }
-        LayoutInflater inflater = LayoutInflater.from(mContext);
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         if(viewType == ITEMTYPE_LOADMORE) {
-            mLoadingHolder = new RecyclerHolder(
-                    inflater.inflate(com.blueprint.R.layout.item_recyc_loading_more, parent, false));
-            mLoadingHolder.setTag(TAG_LOADING);
-            if(mStaggeredGridLayoutManager != null) {
-                StaggeredGridLayoutManager.LayoutParams fullSpanLayoutparam = new StaggeredGridLayoutManager.LayoutParams(
-                        -1, -2);
-                fullSpanLayoutparam.setFullSpan(true);
-                ( (LinearLayout)mLoadingHolder.getView(com.blueprint.R.id.recyc_item_tv_loadmore).getParent() )
-                        .setLayoutParams(fullSpanLayoutparam);
+            mLoadingHolder = onCreateLoadingHolder(parent);
+            if(mLoadingHolder == null) {
+                mLoadingHolder = new RecyclerHolder(
+                        inflater.inflate(com.blueprint.R.layout.item_recyc_loading_more, parent, false));
+                mLoadingHolder.setTag(TAG_LOADING);
+                if(mStaggeredGridLayoutManager != null) {
+                    StaggeredGridLayoutManager.LayoutParams fullSpanLayoutparam = new StaggeredGridLayoutManager.LayoutParams(
+                            -1, -2);
+                    fullSpanLayoutparam.setFullSpan(true);
+                    ( (LinearLayout)mLoadingHolder.getView(com.blueprint.R.id.recyc_item_tv_loadmore).getParent() )
+                            .setLayoutParams(fullSpanLayoutparam);
+                }
+                mLoadingHolder.setOnClickListener(com.blueprint.R.id.recyc_item_tv_loadmore, this);
             }
-            mLoadingHolder.setOnClickListener(com.blueprint.R.id.recyc_item_tv_loadmore, this);
             return mLoadingHolder;
         }else {
 
@@ -161,13 +159,13 @@ public class LoadMoreWrapperAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         if(v.getId() == com.blueprint.R.id.recyc_item_tv_loadmore && !mInLoadingMore) {
             mInLoadingMore = true;
             //点击重试之后变成加载更多
-            String s = mContext.getString(com.blueprint.R.string.jonas_recyc_loading_more);
+            String s = findString(com.blueprint.R.string.jonas_recyc_loading_more);
             if(s.equals(
                     ( (TextView)mLoadingHolder.getView(com.blueprint.R.id.recyc_item_tv_loadmore) ).getText().toString()
                             .trim())) {
                 slog_d(TAG, "点击加载更多");
                 mLoadingHolder.setText(com.blueprint.R.id.recyc_item_tv_loadmore,
-                        mContext.getString(com.blueprint.R.string.jonas_recyc_loading_more));
+                        findString(com.blueprint.R.string.jonas_recyc_loading_more));
                 if(mListener != null && mLoadmoreitem == 1) {
                     mListener.onLoadingMore();
                 }
@@ -178,21 +176,19 @@ public class LoadMoreWrapperAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     /**
      * 外部手动调用 加载错误
      */
-    public LoadMoreWrapperAdapter loadError(){
+    public void loadError(){
         mLoadingHolder.setText(com.blueprint.R.id.recyc_item_tv_loadmore,
-                mContext.getString(com.blueprint.R.string.jonas_recyc_load_retry));
-        return this;
+                findString(com.blueprint.R.string.jonas_recyc_load_retry));
     }
 
     /**
-     * 不需要 上拉刷新
+     * 没有更多内容
      *
      * @return
      */
-    public LoadMoreWrapperAdapter noMoreLoad(){
+    public void noMoreLoad(){
         mLoadmoreitem = 0;
         notifyDataSetChanged();
-        return this;
     }
 
     public interface OnMoreloadListener {
@@ -283,5 +279,20 @@ public class LoadMoreWrapperAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 child.setElevation(( (Float)viewHolder.itemView.getTag() ));
             }
         }
+    }
+
+    /**
+     * 自定义实现上拉加载布局
+     * 同时需要复写 {@link #loadError()},{@link #noMoreLoad()}
+     *
+     * @param parent
+     * @return
+     */
+    public RecyclerHolder onCreateLoadingHolder(ViewGroup parent){
+        return null;
+    }
+
+    protected boolean enableUpMore(){
+        return true;
     }
 }

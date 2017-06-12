@@ -129,4 +129,9 @@ public class MainActivity extends BaseActivity {
 
         RxBus.getInstance().unregisterAll();
     }
+
+    @Override
+    public void onBackPressed(){
+        doubleExit();
+    }
 }

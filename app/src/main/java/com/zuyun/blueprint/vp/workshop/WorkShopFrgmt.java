@@ -12,6 +12,7 @@ import com.zuyun.blueprint.vp.workshop.topic.TopicFrgmt;
 import com.blueprint.adapter.frgmt.BaseFrgmtFractory;
 import com.zuyun.blueprint.R;
 
+import april.yun.other.JTabStyleDelegate;
 import butterknife.BindArray;
 
 /**
@@ -75,4 +76,9 @@ public class WorkShopFrgmt extends BaseTabViewpagerFrgmt {
         }
     }
 
+    @Override
+    protected void reConfigTabStrip(JTabStyleDelegate tabStyleDelegate){
+        super.reConfigTabStrip(tabStyleDelegate);
+        tabStyleDelegate.setShouldExpand(true);
+    }
 }

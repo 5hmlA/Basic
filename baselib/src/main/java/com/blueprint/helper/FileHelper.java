@@ -5,6 +5,8 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.blueprint.rx.RxUtill;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -14,6 +16,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.annotations.NonNull;
 
 /**
  * Created by _SOLID
@@ -26,72 +33,73 @@ public class FileHelper {
     private static String FILE_WRITING_ENCODING = "UTF-8";
     private static String FILE_READING_ENCODING = "UTF-8";
 
-    public static String readFile(String _sFileName, String _sEncoding) throws Exception {
+    public static String readFile(String _sFileName, String _sEncoding) throws Exception{
         StringBuffer buffContent = null;
         String sLine;
 
         FileInputStream fis = null;
         BufferedReader buffReader = null;
-        if (_sEncoding == null || "".equals(_sEncoding)) {
+        if(_sEncoding == null || "".equals(_sEncoding)) {
             _sEncoding = FILE_READING_ENCODING;
         }
 
         try {
             fis = new FileInputStream(_sFileName);
-            buffReader = new BufferedReader(new InputStreamReader(fis,
-                    _sEncoding));
+            buffReader = new BufferedReader(new InputStreamReader(fis, _sEncoding));
             boolean zFirstLine = "UTF-8".equalsIgnoreCase(_sEncoding);
-            while ((sLine = buffReader.readLine()) != null) {
-                if (buffContent == null) {
+            while(( sLine = buffReader.readLine() ) != null) {
+                if(buffContent == null) {
                     buffContent = new StringBuffer();
-                } else {
+                }else {
                     buffContent.append("\n");
                 }
-                if (zFirstLine) {
+                if(zFirstLine) {
                     sLine = removeBomHeaderIfExists(sLine);
                     zFirstLine = false;
                 }
                 buffContent.append(sLine);
             }// end while
-            return (buffContent == null ? "" : buffContent.toString());
-        } catch (FileNotFoundException ex) {
+            return ( buffContent == null ? "" : buffContent.toString() );
+        }catch(FileNotFoundException ex) {
             throw new Exception("要读取的文件没有找到!", ex);
-        } catch (IOException ex) {
+        }catch(IOException ex) {
             throw new Exception("读取文件时错误!", ex);
-        } finally {
+        }finally {
             // 增加异常时资源的释放
             try {
-                if (buffReader != null)
+                if(buffReader != null) {
                     buffReader.close();
-                if (fis != null)
+                }
+                if(fis != null) {
                     fis.close();
-            } catch (Exception ex) {
+                }
+            }catch(Exception ex) {
                 ex.printStackTrace();
             }
         }
     }
 
-    public static File writeFile(String path, String content, String encoding, boolean isOverride) throws Exception {
-        if (TextUtils.isEmpty(encoding)) {
+    public static File writeFile(String path, String content, String encoding, boolean isOverride) throws Exception{
+        if(TextUtils.isEmpty(encoding)) {
             encoding = FILE_WRITING_ENCODING;
         }
         InputStream is = new ByteArrayInputStream(content.getBytes(encoding));
         return writeFile(is, path, isOverride);
     }
 
-    public static File writeFile(InputStream is, String path, boolean isOverride) throws Exception {
+    public static File writeFile(InputStream is, String path, boolean isOverride) throws Exception{
         String sPath = extractFilePath(path);
-        if (!pathExists(sPath)) {
+        if(!pathExists(sPath)) {
             makeDir(sPath, true);
         }
 
-        if (!isOverride && fileExists(path)) {
-            if (path.contains(".")) {
+        if(!isOverride && fileExists(path)) {
+            if(path.contains(".")) {
                 String suffix = path.substring(path.lastIndexOf("."));
                 String pre = path.substring(0, path.lastIndexOf("."));
-                path = pre + "_" + System.currentTimeMillis() + suffix;
-            } else {
-                path = path + "_" + System.currentTimeMillis();
+                path = pre+"_"+System.currentTimeMillis()+suffix;
+            }else {
+                path = path+"_"+System.currentTimeMillis();
             }
         }
 
@@ -104,22 +112,24 @@ public class FileHelper {
             int byteCount = 0;
             byte[] bytes = new byte[1024];
 
-            while ((byteCount = is.read(bytes)) != -1) {
+            while(( byteCount = is.read(bytes) ) != -1) {
                 os.write(bytes, 0, byteCount);
             }
             os.flush();
 
             return file;
-        } catch (Exception e) {
+        }catch(Exception e) {
             e.printStackTrace();
             throw new Exception("写文件错误", e);
-        } finally {
+        }finally {
             try {
-                if (os != null)
+                if(os != null) {
                     os.close();
-                if (is != null)
+                }
+                if(is != null) {
                     is.close();
-            } catch (Exception e) {
+                }
+            }catch(Exception e) {
                 e.printStackTrace();
             }
         }
@@ -128,21 +138,22 @@ public class FileHelper {
     /**
      * 移除字符串中的BOM前缀
      *
-     * @param _sLine 需要处理的字符串
+     * @param _sLine
+     *         需要处理的字符串
      * @return 移除BOM后的字符串.
      */
-    private static String removeBomHeaderIfExists(String _sLine) {
-        if (_sLine == null) {
+    private static String removeBomHeaderIfExists(String _sLine){
+        if(_sLine == null) {
             return null;
         }
         String line = _sLine;
-        if (line.length() > 0) {
+        if(line.length()>0) {
             char ch = line.charAt(0);
             // 使用while是因为用一些工具看到过某些文件前几个字节都是0xfffe.
             // 0xfeff,0xfffe是字节序的不同处理.JVM中,一般是0xfeff
-            while ((ch == 0xfeff || ch == 0xfffe)) {
+            while(( ch == 0xfeff || ch == 0xfffe )) {
                 line = line.substring(1);
-                if (line.length() == 0) {
+                if(line.length() == 0) {
                     break;
                 }
                 ch = line.charAt(0);
@@ -157,27 +168,28 @@ public class FileHelper {
      * @param _sFilePathName
      * @return
      */
-    public static String extractFilePath(String _sFilePathName) {
+    public static String extractFilePath(String _sFilePathName){
         int nPos = _sFilePathName.lastIndexOf('/');
-        if (nPos < 0) {
+        if(nPos<0) {
             nPos = _sFilePathName.lastIndexOf('\\');
         }
 
-        return (nPos >= 0 ? _sFilePathName.substring(0, nPos + 1) : "");
+        return ( nPos>=0 ? _sFilePathName.substring(0, nPos+1) : "" );
     }
 
     /**
      * 检查指定文件的路径是否存在
      *
-     * @param _sPathFileName 文件名称(含路径）
+     * @param _sPathFileName
+     *         文件名称(含路径）
      * @return 若存在，则返回true；否则，返回false
      */
-    public static boolean pathExists(String _sPathFileName) {
+    public static boolean pathExists(String _sPathFileName){
         String sPath = extractFilePath(_sPathFileName);
         return fileExists(sPath);
     }
 
-    public static boolean fileExists(String _sPathFileName) {
+    public static boolean fileExists(String _sPathFileName){
         File file = new File(_sPathFileName);
         return file.exists();
     }
@@ -185,27 +197,31 @@ public class FileHelper {
     /**
      * 创建目录
      *
-     * @param _sDir             目录名称
-     * @param _bCreateParentDir 如果父目录不存在，是否创建父目录
+     * @param _sDir
+     *         目录名称
+     * @param _bCreateParentDir
+     *         如果父目录不存在，是否创建父目录
      * @return
      */
-    public static boolean makeDir(String _sDir, boolean _bCreateParentDir) {
+    public static boolean makeDir(String _sDir, boolean _bCreateParentDir){
         boolean zResult = false;
         File file = new File(_sDir);
-        if (_bCreateParentDir)
+        if(_bCreateParentDir) {
             zResult = file.mkdirs(); // 如果父目录不存在，则创建所有必需的父目录
-        else
+        }else {
             zResult = file.mkdir(); // 如果父目录不存在，不做处理
-        if (!zResult)
+        }
+        if(!zResult) {
             zResult = file.exists();
+        }
         return zResult;
     }
 
 
-    public static void moveRawToDir(Context context, String rawName, String dir) {
+    public static void moveRawToDir(Context context, String rawName, String dir){
         try {
             writeFile(context.getAssets().open(rawName), dir, true);
-        } catch (Exception e) {
+        }catch(Exception e) {
             e.printStackTrace();
             Log.e(TAG, e.getMessage());
         }
@@ -217,18 +233,18 @@ public class FileHelper {
      * @param context
      * @return
      */
-    public static File getCacheDir(Context context) {
-        Log.i("getCacheDir", "cache sdcard state: " + Environment.getExternalStorageState());
-        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+    public static File getCacheDir(Context context){
+        Log.i("getCacheDir", "cache sdcard state: "+Environment.getExternalStorageState());
+        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             File cacheDir = context.getExternalCacheDir();
-            if (cacheDir != null && (cacheDir.exists() || cacheDir.mkdirs())) {
-                Log.i("getCacheDir", "cache dir: " + cacheDir.getAbsolutePath());
+            if(cacheDir != null && ( cacheDir.exists() || cacheDir.mkdirs() )) {
+                Log.i("getCacheDir", "cache dir: "+cacheDir.getAbsolutePath());
                 return cacheDir;
             }
         }
 
         File cacheDir = context.getCacheDir();
-        Log.i("getCacheDir", "cache dir: " + cacheDir.getAbsolutePath());
+        Log.i("getCacheDir", "cache dir: "+cacheDir.getAbsolutePath());
 
         return cacheDir;
     }
@@ -239,42 +255,112 @@ public class FileHelper {
      * @param context
      * @return
      */
-    public static File getSkinDir(Context context) {
+    public static File getSkinDir(Context context){
         File skinDir = new File(getCacheDir(context), "skin");
-        if (skinDir.exists()) {
+        if(skinDir.exists()) {
             skinDir.mkdirs();
         }
         return skinDir;
     }
 
-    public static String getSkinDirPath(Context context) {
+    public static String getSkinDirPath(Context context){
         return getSkinDir(context).getAbsolutePath();
     }
 
-    public static String getSaveImagePath(Context context) {
+    public static String getSaveImagePath(Context context){
 
         String path = getCacheDir(context).getAbsolutePath();
-        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            path = Environment.getExternalStorageDirectory().getAbsolutePath()
-                    + File.separator + Environment.DIRECTORY_DCIM;
-        } else {
-            path = path + File.separator + "Pictures";
+        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            path = Environment.getExternalStorageDirectory()
+                    .getAbsolutePath()+File.separator+Environment.DIRECTORY_DCIM;
+        }else {
+            path = path+File.separator+"Pictures";
         }
         File file = new File(path);
-        if (!file.exists()) {
+        if(!file.exists()) {
             file.mkdir();
         }
         return path;
     }
 
-    public static String generateFileNameByTime() {
-        return System.currentTimeMillis() + "";
+    public static String generateFileNameByTime(){
+        return System.currentTimeMillis()+"";
     }
 
-    public static String getFileName(String path) {
+    public static String getFileName(String path){
         int index = path.lastIndexOf('/');
-        return path.substring(index + 1);
+        return path.substring(index+1);
+    }
+
+    public static Single<Boolean> clearFile(final File file){
+        return Single.create(new SingleOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(@NonNull SingleEmitter<Boolean> e) throws Exception{
+                doClearFile(file);
+                e.onSuccess(true);
+            }
+        }).compose(RxUtill.<Boolean>defaultSchedulers_single());
     }
 
 
+    public static void doClearFile(File file){
+        if(file == null || !file.exists()) {
+            return;
+        }
+        if(file.isDirectory()) {
+            for(File child : file.listFiles()) {
+                doClearFile(child);
+            }
+        }else {
+            file.delete();
+        }
+    }
+
+    public static Single<Long> getDirSize(final File dir){
+        return Single.create(new SingleOnSubscribe<Long>() {
+            @Override
+            public void subscribe(@NonNull SingleEmitter<Long> e) throws Exception{
+                e.onSuccess(calcureDirSize(dir));
+            }
+        }).compose(RxUtill.<Long>defaultSchedulers_single());
+    }
+
+    public static long calcureDirSize(File dir){
+        if(dir == null) {
+            return 0;
+        }
+        if(!dir.isDirectory()) {
+            return 0;
+        }
+        long dirSize = 0;
+        File[] files = dir.listFiles();
+        for(File file : files) {
+            if(file.isFile()) {
+                dirSize += file.length();
+            }else if(file.isDirectory()) {
+                dirSize += file.length();
+                dirSize += calcureDirSize(file); // 递归调用继续统计
+            }
+        }
+        return dirSize;
+    }
+
+    public static String formatFileSize(long fileS){
+        java.text.DecimalFormat df = new java.text.DecimalFormat("#.00");
+        String fileSizeString = "";
+        if(fileS<1024) {
+            fileSizeString = df.format((double)fileS)+"B";
+        }else if(fileS<1048576) {
+            fileSizeString = df.format((double)fileS/1024)+"KB";
+        }else if(fileS<1073741824) {
+            fileSizeString = df.format((double)fileS/1048576)+"MB";
+        }else {
+            fileSizeString = df.format((double)fileS/1073741824)+"G";
+        }
+
+        if(fileSizeString.startsWith(".")) {
+            return "0B";
+        }
+        return fileSizeString;
+    }
 }

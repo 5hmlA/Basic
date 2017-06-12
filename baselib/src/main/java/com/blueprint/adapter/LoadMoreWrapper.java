@@ -31,7 +31,7 @@ public abstract class LoadMoreWrapper extends RecyclerView.Adapter<RecyclerView.
     private static final String TAG_LOADING = "loadingholder";
     private int PAGESIZE = 10;
     private final static String TAG = BaseRecvAdapter.class.getSimpleName();
-    private MultiTypeAdapter mInnerAdapter;
+    protected MultiTypeAdapter mInnerAdapter;
     private List<Object> mData;
     private Context mContext;
     private RecyclerHolder mLoadingHolder;
@@ -41,8 +41,11 @@ public abstract class LoadMoreWrapper extends RecyclerView.Adapter<RecyclerView.
      * <p> 0 表示 没有更多可加载了
      */
     private int mLoadmoreitem = 1;
-    private StaggeredGridLayoutManager mStaggeredGridLayoutManager;
-    private boolean mInLoadingMore;
+    protected StaggeredGridLayoutManager mStaggeredGridLayoutManager;
+    /**
+     * 正处于 加载数据 状态
+     */
+    protected boolean mInLoadingMore;
 
 
     /**
@@ -51,8 +54,8 @@ public abstract class LoadMoreWrapper extends RecyclerView.Adapter<RecyclerView.
     public LoadMoreWrapper(MultiTypeAdapter innerAdapter){
         mInnerAdapter = innerAdapter;
         mData = (List<Object>)mInnerAdapter.getItems();
+        mLoadmoreitem = enableUpMore() ? 1 : 0;
     }
-
 
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView){
@@ -92,7 +95,10 @@ public abstract class LoadMoreWrapper extends RecyclerView.Adapter<RecyclerView.
         }
     }
 
-
+    /**
+     * 超过 PAGESIZE 数据 才会显示上拉加载更多
+     * @return
+     */
     @Override
     public int getItemCount(){
         return mData.size()>PAGESIZE ? mData.size()+mLoadmoreitem : mData.size();
@@ -251,14 +257,19 @@ public abstract class LoadMoreWrapper extends RecyclerView.Adapter<RecyclerView.
     protected abstract RecyclerHolder onCreateLoadingHolder(ViewGroup parent);
 
     /**
-     * 外部手动调用 加载错误 需要设置点击事件
+     * 上拉加载错误的界面改变，外部手动调用 加载错误 需要设置点击事件
      */
     public abstract LoadMoreWrapper loadError();
 
     /**
-     * 不需要 上拉刷新
+     * 上拉之后 没有更多数据了
      *
      * @return
      */
     public abstract LoadMoreWrapper noMoreLoad();
+
+    protected boolean enableUpMore(){
+        return true;
+    }
+
 }

@@ -64,6 +64,12 @@ public abstract class BaseTitleFrgmt extends BaseFragment {
         //        setTextView(mMultiStateLayout.getErrorLayout(), R.id.j_multity_retry, setErrorRetryMsg());
 
         setClicks();
+
+        refreshTitleBar();
+    }
+
+    protected void refreshTitleBar(){
+
     }
 
     private void setClicks(){

@@ -34,7 +34,7 @@ dependencies {
 
     compile thirdLibs.jtabstrip
     compile 'com.yun.ospl:multitstatelayout:1.6@aar'
-    compile('me.drakeet.multitype:multitype:3.0.1', {
+    compile('me.drakeet.multitype:multitype:2.5.0-beta', {
         exclude group: 'com.android.support'
     })
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
