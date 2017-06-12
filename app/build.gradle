@@ -41,8 +41,6 @@ dependencies {
     compile thirdLibs.butterknife
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.6.0'
 
-    compile thirdLibs.logger
-
     compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4@aar'
 
     compile project(':baselib')

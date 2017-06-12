@@ -25,7 +25,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 
-import static com.blueprint.LibApp.slog_d;
+import static com.blueprint.helper.LogHelper.slog_d;
 
 /**
  * @author 江祖赟.
@@ -85,13 +85,16 @@ public class LoopImagePager extends RelativeLayout {
     }
 
     private void startLoop(){
+        if(mAdapter == null || mAdapter.getCount()<=1) {
+            return;
+        }
         if(mSubscribe == null || mSubscribe.isDisposed()) {
             slog_d(TAG, "start loop ==============");
             mSubscribe = Observable.interval(LOOPINTERVAL, TimeUnit.SECONDS).observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Consumer<Long>() {
                         @Override
                         public void accept(Long aLong) throws Exception{
-                           //并不是立刻執行
+                            //并不是立刻執行
                             if(getLocalVisibleRect(mVisibleRect)) {
                                 //可见
                                 mViewPager.setCurrentItem(++mCurrentPosition);
@@ -120,6 +123,7 @@ public class LoopImagePager extends RelativeLayout {
     public LoopImagePager setPagerData(List<String> pagerData){
         mAdapter = new ImagePagerAdapter(pagerData);
         mViewPager.setAdapter(mAdapter);
+        mCurrentPosition = pagerData.size()>1 ? mCurrentPosition : 0;
         mViewPager.setCurrentItem(mCurrentPosition);
         if(mL != null) {
             mAdapter.setOnitemClickListener(mL);
@@ -129,30 +133,32 @@ public class LoopImagePager extends RelativeLayout {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event){
-        //在列表中 上下滚动事件传不到 但是能够接收少量move事件
-        //所以简单的down就停止不够，当上下滑动开启循环
-        switch(event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                mLastMoved.set(event.getX(), event.getY());
-                mMove = false;
-                stopLoop();
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if(Math.abs(event.getX()-mLastMoved.x)<Math.abs(event.getY()-mLastMoved.y)) {
-                    //down的时候关了
-                    startLoop();
-                }else {
-                    slog_d(TAG, "move");
-                    mMove = true;
+        if(mAdapter != null && mAdapter.getCount()>1) {
+            //在列表中 上下滚动事件传不到 但是能够接收少量move事件
+            //所以简单的down就停止不够，当上下滑动开启循环
+            switch(event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    mLastMoved.set(event.getX(), event.getY());
+                    mMove = false;
                     stopLoop();
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-                slog_d(TAG, "up");
-                mMove = false;
-                startLoop();
-                break;
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    if(Math.abs(event.getX()-mLastMoved.x)<Math.abs(event.getY()-mLastMoved.y)) {
+                        //down的时候关了
+                        startLoop();
+                    }else {
+                        slog_d(TAG, "move");
+                        mMove = true;
+                        stopLoop();
+                    }
+                    break;
+                case MotionEvent.ACTION_UP:
+                    slog_d(TAG, "up");
+                    mMove = false;
+                    startLoop();
+                    break;
 
+            }
         }
         return super.dispatchTouchEvent(event);
     }
@@ -196,7 +202,7 @@ public class LoopImagePager extends RelativeLayout {
 
         @Override
         public int getCount(){
-            return Integer.MAX_VALUE;
+            return mPagerData.size()>1 ? Integer.MAX_VALUE : 1;
         }
 
         @Override

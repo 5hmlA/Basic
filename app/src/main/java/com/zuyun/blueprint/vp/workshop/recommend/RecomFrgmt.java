@@ -79,7 +79,7 @@ public class RecomFrgmt extends BaseTitleFrgmt implements RecomContract.IRecomVi
     @Override
     public void showSucceed(){
         mListData.add(1, new ItemChangeMoudle("第x个"));
-        mMultiTypeAdapter.setItems(mListData);
+//        mMultiTypeAdapter.setItems(mListData);
         mMultiTypeAdapter.notifyItemInserted(1);
         mMultiStateLayout.showStateLayout(MultiStateLayout.LayoutState.STATE_EXCEPT);
     }
@@ -93,7 +93,7 @@ public class RecomFrgmt extends BaseTitleFrgmt implements RecomContract.IRecomVi
     public void addLoopImageHolder(List<String> urls){
         // 如果第一个holder不是loopimage就添加
         mListData.add(0, new ItemLoopImage(urls));
-        mMultiTypeAdapter.setItems(mListData);
+//        mMultiTypeAdapter.setItems(mListData);
         mMultiTypeAdapter.notifyItemInserted(0);
         mCommonRecv.smoothScrollToPosition(0);
 

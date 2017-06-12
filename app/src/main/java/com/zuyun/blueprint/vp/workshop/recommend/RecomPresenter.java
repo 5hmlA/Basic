@@ -1,21 +1,23 @@
 package com.zuyun.blueprint.vp.workshop.recommend;
 
-import com.zuyun.blueprint.data.bean.GanHuoData;
-import com.zuyun.blueprint.data.bean.MeiZhi;
-import com.zuyun.blueprint.data.netsource.urlapi.GankService;
-import com.zuyun.blueprint.data.netsource.urlapi.MeiZhiService;
 import com.blueprint.http.HttpResult;
 import com.blueprint.http.ServiceFactory;
 import com.blueprint.rx.RxUtill;
 import com.orhanobut.logger.Logger;
+import com.zuyun.blueprint.data.bean.GanHuoData;
+import com.zuyun.blueprint.data.bean.MeiZhi;
+import com.zuyun.blueprint.data.netsource.urlapi.GankService;
+import com.zuyun.blueprint.data.netsource.urlapi.MeiZhiService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * @author 江祖赟.
@@ -48,20 +50,19 @@ public class RecomPresenter implements RecomContract.IRecoPresenter {
                 .getGanHuo("福利", 1);
         Single<HttpResult<List<MeiZhi>>> meizhi = ServiceFactory.getInstance().createService(MeiZhiService.class)
                 .getMeizhi(3);
-        ServiceFactory.getInstance().createService(GankService.class)
-                .getGanHuo("福利", 1)
+        ServiceFactory.getInstance().createService(GankService.class).getGanHuo("福利", 1)
                 .compose(RxUtill.<HttpResult<List<GanHuoData>>>defaultSchedulers_single())
                 .subscribe(new Consumer<HttpResult<List<GanHuoData>>>() {
                     @Override
                     public void accept(@NonNull HttpResult<List<GanHuoData>> listHttpResult) throws Exception{
-//                        listHttpResult
-                        System.out.println("ooo");
-                        List<String> urls = new ArrayList<String>();
-                        for(GanHuoData result : listHttpResult.results) {
-                            urls.add(result.getUrl());
-                        }
-
-                        mView.addLoopImageHolder(urls);
+                        //                        listHttpResult
+                        //                        System.out.println("ooo");
+                        //                        List<String> urls = new ArrayList<String>();
+                        //                        for(GanHuoData result : listHttpResult.results) {
+                        //                            urls.add(result.getUrl());
+                        //                        }
+                        //
+                        //                        mView.addLoopImageHolder(urls);
                         mView.showSucceed();
                     }
                 }, new Consumer<Throwable>() {
@@ -70,30 +71,47 @@ public class RecomPresenter implements RecomContract.IRecoPresenter {
                         System.out.println("eeee");
                     }
                 });
+        Single.merge(福利1, meizhi).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io())
+                .subscribe(new Consumer<HttpResult<? extends List<? extends Object>>>() {
+                    @Override
+                    public void accept(
+                            @NonNull HttpResult<? extends List<? extends Object>> httpResult) throws Exception{
+                        List<String> urls = new ArrayList<String>();
+                        urls.add("https://ws1.sinaimg.cn/large/610dc034ly1fgepc1lpvfj20u011i0wv.jpg");
+                        if(httpResult.results.get(0) instanceof GanHuoData) {
+                            HttpResult<List<GanHuoData>> httpResult1 = (HttpResult<List<GanHuoData>>)httpResult;
+                            for(GanHuoData result : httpResult1.results) {
+                                urls.add(result.getUrl());
+                            }
+                        }
+                        mView.addLoopImageHolder(urls);
+                        mView.showSucceed();
+                    }
+                });
 
-//        Disposable error = Single
-//                .zip(福利1, meizhi, new BiFunction<HttpResult<List<GanHuoData>>,HttpResult<List<MeiZhi>>,List<Object>>() {
-//                    @Override
-//                    public List<Object> apply(
-//                            @NonNull HttpResult<List<GanHuoData>> listHttpResult,
-//                            @NonNull HttpResult<List<MeiZhi>> listHttpResult2) throws Exception{
-//                        List<Object> objects = new ArrayList<Object>();
-//                        objects.add(listHttpResult.results);
-//                        objects.add(listHttpResult2);
-//
-//                        return objects;
-//                    }
-//                }).compose(RxUtill.<List<Object>>defaultSchedulers_single()).subscribe(new Consumer<List<Object>>() {
-//                    @Override
-//                    public void accept(@NonNull List<Object> objects) throws Exception{
-//
-//                    }
-//                }, new Consumer<Throwable>() {
-//                    @Override
-//                    public void accept(@NonNull Throwable throwable) throws Exception{
-//                        System.out.println("error");
-//                    }
-//                });
+        //        Disposable error = Single
+        //                .zip(福利1, meizhi, new BiFunction<HttpResult<List<GanHuoData>>,HttpResult<List<MeiZhi>>,List<Object>>() {
+        //                    @Override
+        //                    public List<Object> apply(
+        //                            @NonNull HttpResult<List<GanHuoData>> listHttpResult,
+        //                            @NonNull HttpResult<List<MeiZhi>> listHttpResult2) throws Exception{
+        //                        List<Object> objects = new ArrayList<Object>();
+        //                        objects.add(listHttpResult.results);
+        //                        objects.add(listHttpResult2);
+        //
+        //                        return objects;
+        //                    }
+        //                }).compose(RxUtill.<List<Object>>defaultSchedulers_single()).subscribe(new Consumer<List<Object>>() {
+        //                    @Override
+        //                    public void accept(@NonNull List<Object> objects) throws Exception{
+        //
+        //                    }
+        //                }, new Consumer<Throwable>() {
+        //                    @Override
+        //                    public void accept(@NonNull Throwable throwable) throws Exception{
+        //                        System.out.println("error");
+        //                    }
+        //                });
 
         loadLoopImage();
     }

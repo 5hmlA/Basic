@@ -12,6 +12,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.orhanobut.logger.AndroidLogAdapter;
+import com.orhanobut.logger.Logger;
+
 
 public class LibApp {
 
@@ -20,8 +23,15 @@ public class LibApp {
     private static Context sContext;
     private static boolean sInDebug;
 
-    public static void init(Context context){
+    public static void init(Context context,boolean inDebug){
+        sInDebug = inDebug;
         sContext = context.getApplicationContext();
+        Logger.addLogAdapter(new AndroidLogAdapter() {
+            @Override public boolean isLoggable(int priority, String tag) {
+                return sInDebug;
+            }
+        });
+
     }
 
     public static Context getContext(){
@@ -112,15 +122,4 @@ public class LibApp {
         return sInDebug;
     }
 
-    public static void slog_d(String tag, String msg){
-        if(sInDebug) {
-            Log.d(tag, msg);
-        }
-    }
-
-    public static void slog_e(String tag, String msg){
-        if(sInDebug) {
-            Log.e(tag, msg);
-        }
-    }
 }

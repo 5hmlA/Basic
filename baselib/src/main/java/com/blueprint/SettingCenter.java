@@ -4,6 +4,8 @@ import com.blueprint.helper.SpHelper;
 import com.blueprint.rx.RxUtill;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 import io.reactivex.Single;
 import io.reactivex.SingleEmitter;
@@ -11,6 +13,16 @@ import io.reactivex.SingleOnSubscribe;
 import io.reactivex.annotations.NonNull;
 
 public class SettingCenter {
+
+    public static Set<String> sMsaveDataUrls = new HashSet<>();
+
+    public static void needSaveDataUrl(String url){
+        sMsaveDataUrls.add(url);
+    }
+
+    public static boolean isNeedSaveData(String url){
+        return sMsaveDataUrls.contains(url);
+    }
 
     public static boolean getOnlyWifiLoadImage(){
         return (boolean)SpHelper.get(LibApp.getContext(), "getOnlyWifiLoadImage", false);

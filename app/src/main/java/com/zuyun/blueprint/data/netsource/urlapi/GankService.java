@@ -10,6 +10,7 @@ import java.util.List;
 
 import io.reactivex.Single;
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
 import retrofit2.http.Path;
 
 /**
@@ -37,6 +38,7 @@ public interface GankService {
      * @param pageIndex
      * @return
      */
+    @Headers("Cache-Control: public, max-age=5")
     @GET("data/{category}/10/{pageIndex}")
     Single<HttpResult<List<GanHuoData>>> getGanHuo(@Path("category") String category
             , @Path("pageIndex") int pageIndex);

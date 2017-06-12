@@ -3,22 +3,20 @@ package com.blueprint.adapter;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.Size;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.util.SparseArray;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.Collections;
 import java.util.List;
+
+import me.drakeet.multitype.MultiTypeAdapter;
 
 import static com.blueprint.helper.LogHelper.slog_d;
 import static com.blueprint.helper.LogHelper.slog_e;
@@ -27,14 +25,14 @@ import static com.blueprint.helper.LogHelper.slog_e;
 /**
  * @des [recycleview适配器 基类，上拉加载更多,多类型布局,拖拽,滑动删除 支持]
  */
-public abstract class AwesomeRecvAdapter<T> extends RecyclerView.Adapter<RecyclerHolder> implements View.OnClickListener, DragSwipeAdapter {
+public abstract class LoadMoreWrapper extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener, DragSwipeAdapter {
 
     private static final int ITEMTYPE_LOADMORE = -13;
     private static final String TAG_LOADING = "loadingholder";
     private int PAGESIZE = 10;
     private final static String TAG = BaseRecvAdapter.class.getSimpleName();
-    private SparseArray<Integer> mItemLayoutIds = new SparseArray<>();
-    private List<T> mData;
+    private MultiTypeAdapter mInnerAdapter;
+    private List<Object> mData;
     private Context mContext;
     private RecyclerHolder mLoadingHolder;
     private OnMoreloadListener mListener;
@@ -45,73 +43,26 @@ public abstract class AwesomeRecvAdapter<T> extends RecyclerView.Adapter<Recycle
     private int mLoadmoreitem = 1;
     private StaggeredGridLayoutManager mStaggeredGridLayoutManager;
 
-    /**
-     * 多布局模式 不支持上拉加载更多
-     * <p>需要重写{@link #getCustomItemViewType(int)}</p>
-     *
-     * @param data
-     * @param itemLayoutId
-     *         <p color="white">数组下标 作为item类型</p>
-     */
-    public AwesomeRecvAdapter(@NonNull List<T> data, @Size(min = 1) int... itemLayoutId){
-        for(int i = 0; i<itemLayoutId.length; i++) {
-            mItemLayoutIds.append(i, itemLayoutId[i]);
-        }
-        mLoadmoreitem = 0;
-        mData = data;
-    }
 
     /**
      * 多布局模式 支持上拉刷新
-     * <p>需要重写{@link #getCustomItemViewType(int)}</p>
-     *
-     * @param data
-     * @param recv
-     * @param itemLayoutId
-     *         <p color="white">数组下标 作为item类型</p>
      */
-    public AwesomeRecvAdapter(
-            @NonNull List<T> data, @NonNull final RecyclerView recv, @Size(min = 1) int... itemLayoutId){
-        for(int i = 0; i<itemLayoutId.length; i++) {
-            mItemLayoutIds.append(i, itemLayoutId[i]);
-        }
-        mData = data;
-        loadMoreInit(data, recv);
+    public LoadMoreWrapper(MultiTypeAdapter innerAdapter){
+        mInnerAdapter = innerAdapter;
+        mData = (List<Object>)mInnerAdapter.getItems();
     }
 
-    /**
-     * 多布局模式 支持上拉刷新
-     * <p>需要重写{@link #setItemLayouts(SparseArray)}和{@link #getCustomItemViewType(int)}</p>
-     *
-     * @param data
-     * @param recv
-     */
-    public AwesomeRecvAdapter(@NonNull List<T> data, @NonNull final RecyclerView recv){
-        mData = data;
-        setItemLayouts(mItemLayoutIds);
-        loadMoreInit(data, recv);
-    }
 
-    /**
-     * 多布局模式 不支持上拉刷新
-     * <p>需要重写{@link AwesomeRecvAdapter#setItemLayouts(SparseArray)}和{@link AwesomeRecvAdapter#getCustomItemViewType(int)}</p>
-     *
-     * @param data
-     */
-    public AwesomeRecvAdapter(@NonNull List<T> data){
-        mData = data;
-        setItemLayouts(mItemLayoutIds);
-        mLoadmoreitem = 0;
-    }
-
-    private void loadMoreInit(@NonNull List<T> data, @NonNull final RecyclerView recv){
-        mContext = recv.getContext();
-        setSpanCount(recv);
-        recv.addOnScrollListener(new RecyclerView.OnScrollListener() {
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView){
+        super.onAttachedToRecyclerView(recyclerView);
+        mContext = recyclerView.getContext();
+        setSpanCount(recyclerView);
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy){
                 super.onScrolled(recyclerView, dx, dy);
-                if(!ViewCompat.canScrollVertically(recv, 1) && mLoadmoreitem == 1) {
+                if(!ViewCompat.canScrollVertically(recyclerView, 1) && mLoadmoreitem == 1) {
                     if(mListener != null) {
                         mListener.onLoadingMore();
                     }
@@ -139,25 +90,6 @@ public abstract class AwesomeRecvAdapter<T> extends RecyclerView.Adapter<Recycle
         }
     }
 
-    /**
-     * 设置 type 和 布局 需要同时复写getItemViewType
-     * <p color="red">itemLayoutIds.append(type,itemLayoutId);
-     *
-     * @param itemLayoutIds
-     */
-    protected void setItemLayouts(SparseArray<Integer> itemLayoutIds){
-
-    }
-
-    /**
-     * @param viewType
-     *         和getItemViewType 相对应
-     * @return
-     */
-    public int getItemTypeLayout(int viewType){
-        return mItemLayoutIds.get(viewType);
-    }
-
 
     @Override
     public int getItemCount(){
@@ -169,46 +101,26 @@ public abstract class AwesomeRecvAdapter<T> extends RecyclerView.Adapter<Recycle
         if(position == mData.size()) {
             return ITEMTYPE_LOADMORE;
         }else {
-            return getCustomItemViewType(position);
+            return mInnerAdapter.getItemViewType(position);
         }
-    }
-
-    protected int getCustomItemViewType(int position){
-        return 0;
     }
 
     @Override
-    public RecyclerHolder onCreateViewHolder(ViewGroup parent, int viewType){
-        if(mContext == null) {
-            mContext = parent.getContext();
-        }
-        LayoutInflater inflater = LayoutInflater.from(mContext);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
         if(viewType == ITEMTYPE_LOADMORE) {
-            mLoadingHolder = new RecyclerHolder(inflater.inflate(com.blueprint.R.layout.item_recyc_loading_more, parent, false));
-            mLoadingHolder.setTag(TAG_LOADING);
-            if(mStaggeredGridLayoutManager != null) {
-                StaggeredGridLayoutManager.LayoutParams fullSpanLayoutparam = new StaggeredGridLayoutManager.LayoutParams(
-                        -1, -2);
-                fullSpanLayoutparam.setFullSpan(true);
-                ( (LinearLayout)mLoadingHolder.getView(com.blueprint.R.id.recyc_item_tv_loadmore).getParent() )
-                        .setLayoutParams(fullSpanLayoutparam);
-            }
-            mLoadingHolder.setOnClickListener(com.blueprint.R.id.recyc_item_tv_loadmore, this);
-            return mLoadingHolder;
+            return mLoadingHolder = onCreateLoadingHolder(parent);
         }else {
-            View root = inflater.inflate(getItemTypeLayout(viewType), parent, false);
-            return new RecyclerHolder(root);
+            return mInnerAdapter.onCreateViewHolder(parent, viewType);
         }
     }
 
     @Override
-    public void onBindViewHolder(final RecyclerHolder holder, final int position){
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position){
         if(position<mData.size()) {
-            convert(holder, position, mData.get(position));
+            mInnerAdapter.onBindViewHolder(holder, position, mData);
         }
     }
 
-    public abstract void convert(RecyclerHolder holder, int position, T itemData);
 
     /**
      * 设置每页显示的数量
@@ -216,7 +128,7 @@ public abstract class AwesomeRecvAdapter<T> extends RecyclerView.Adapter<Recycle
      * @param pagesize
      * @return
      */
-    public AwesomeRecvAdapter setPagesize(int pagesize){
+    public LoadMoreWrapper setPagesize(int pagesize){
         if(mData.size()<pagesize) {
             slog_d(TAG, "mData.size() < pagesize 不显示上拉加载状态");
         }
@@ -227,12 +139,14 @@ public abstract class AwesomeRecvAdapter<T> extends RecyclerView.Adapter<Recycle
     @Override
     public void onClick(View v){
         if(v.getId() == com.blueprint.R.id.recyc_item_tv_loadmore) {
+            //点击重试之后变成加载更多
             String s = mContext.getString(com.blueprint.R.string.jonas_recyc_loading_more);
             if(s.equals(
-                    ( (TextView)mLoadingHolder.getView(com.blueprint.R.id.recyc_item_tv_loadmore) ).getText().toString().trim())) {
+                    ( (TextView)mLoadingHolder.getView(com.blueprint.R.id.recyc_item_tv_loadmore) ).getText().toString()
+                            .trim())) {
                 slog_d(TAG, "点击加载更多");
-                mLoadingHolder
-                        .setText(com.blueprint.R.id.recyc_item_tv_loadmore, mContext.getString(com.blueprint.R.string.jonas_recyc_loading_more));
+                mLoadingHolder.setText(com.blueprint.R.id.recyc_item_tv_loadmore,
+                        mContext.getString(com.blueprint.R.string.jonas_recyc_loading_more));
                 if(mListener != null && mLoadmoreitem == 1) {
                     mListener.onLoadingMore();
                 }
@@ -240,38 +154,19 @@ public abstract class AwesomeRecvAdapter<T> extends RecyclerView.Adapter<Recycle
         }
     }
 
-    /**
-     * 外部手动调用 加载错误
-     */
-    public AwesomeRecvAdapter loadError(){
-        mLoadingHolder.setText(com.blueprint.R.id.recyc_item_tv_loadmore, mContext.getString(com.blueprint.R.string.jonas_recyc_load_retry));
-        return this;
-    }
-
-    /**
-     * 不需要 上拉刷新
-     *
-     * @return
-     */
-    public AwesomeRecvAdapter noMoreLoad(){
-        mLoadmoreitem = 0;
-        notifyDataSetChanged();
-        return this;
-    }
-
     public interface OnMoreloadListener {
         /**
-         * 发起请求 加载更多数据
+         * 发起请求 加载更多数据/重试
          */
         void onLoadingMore();
     }
 
-    public AwesomeRecvAdapter setOnMoreloadListener(OnMoreloadListener listener){
+    public LoadMoreWrapper setOnMoreloadListener(OnMoreloadListener listener){
         mListener = listener;
         return this;
     }
 
-    public void notifyDataChange(@NonNull List<T> data){
+    public void notifyDataChange(@NonNull List<Object> data){
         mData.addAll(data);
         notifyDataSetChanged();
     }
@@ -285,14 +180,14 @@ public abstract class AwesomeRecvAdapter<T> extends RecyclerView.Adapter<Recycle
                 notifyItemRemoved(position);
             }
         }else {
-            slog_e(TAG,"position out of bounde of mData.size()");
+            slog_e(TAG, "position out of bounde of mData.size()");
         }
     }
 
 
-    public void addItem(T data, int position){
+    public void addItem(Object data, int position){
         if(position>mData.size()) {
-            slog_e(TAG,position+" > mData.size():"+mData.size());
+            slog_e(TAG, position+" > mData.size():"+mData.size());
             return;
         }
         mData.add(position, data);
@@ -346,4 +241,19 @@ public abstract class AwesomeRecvAdapter<T> extends RecyclerView.Adapter<Recycle
             }
         }
     }
+
+
+    protected abstract RecyclerHolder onCreateLoadingHolder(ViewGroup parent);
+
+    /**
+     * 外部手动调用 加载错误 需要设置点击事件
+     */
+    public abstract LoadMoreWrapper loadError();
+
+    /**
+     * 不需要 上拉刷新
+     *
+     * @return
+     */
+    public abstract LoadMoreWrapper noMoreLoad();
 }

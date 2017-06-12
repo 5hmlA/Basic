@@ -18,8 +18,9 @@ import android.widget.TextView;
 import java.util.Collections;
 import java.util.List;
 
-import static com.blueprint.LibApp.slog_d;
-import static com.blueprint.LibApp.slog_e;
+import static com.blueprint.helper.LogHelper.slog_d;
+import static com.blueprint.helper.LogHelper.slog_e;
+
 
 /**
  * @des [recycleview适配器 基类，上拉加载更多,多类型布局,拖拽,滑动删除 支持]
