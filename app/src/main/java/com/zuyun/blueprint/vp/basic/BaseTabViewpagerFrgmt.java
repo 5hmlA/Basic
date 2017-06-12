@@ -6,13 +6,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
 
-import com.blueprint.adapter.frgmt.TabAdapter;
+import com.blueprint.LibApp;
 import com.blueprint.adapter.frgmt.BaseFrgmtFractory;
+import com.blueprint.adapter.frgmt.TabAdapter;
 import com.zuyun.blueprint.R;
 
 import april.yun.JPagerSlidingTabStrip;
 import april.yun.other.JTabStyleDelegate;
-import com.blueprint.LibApp;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jonas.jlayout.MultiStateLayout;
@@ -31,7 +31,7 @@ public abstract class BaseTabViewpagerFrgmt extends BaseTitleFrgmt {
 
     @Override
     protected void onCreateContent(LayoutInflater inflater, RelativeLayout fmContent){
-        View rootView = inflater.inflate(R.layout.sec_tab_vp_frgmt, fmContent);
+        View rootView = inflater.inflate(R.layout.jtab_vp_frgmt, fmContent);
         ButterKnife.bind(this, rootView);
         initTabStrip();
         setupAdapter();

@@ -33,7 +33,7 @@ public abstract class BaseTitleFrgmt extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
-        View rootView = inflater.inflate(R.layout.common_titlefm_content, null);
+        View rootView = inflater.inflate(R.layout.jcommon_titlefrgmt_content, null);
         mMultiStateLayout = (MultiStateLayout)rootView.findViewById(R.id.common_frgmt_content);
         mTitleBar = (JTitleBar)rootView.findViewById(R.id.home_titlebar);
         if(requestNoTitleBar()) {
@@ -65,10 +65,14 @@ public abstract class BaseTitleFrgmt extends BaseFragment {
 
         setClicks();
 
-        refreshTitleBar();
+        refreshTitleBar(mTitleBar);
     }
 
-    protected void refreshTitleBar(){
+    /**
+     * 复写 更新titlebar样式
+     * @param titleBar
+     */
+    protected void refreshTitleBar(JTitleBar titleBar){
 
     }
 

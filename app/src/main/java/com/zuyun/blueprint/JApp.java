@@ -22,6 +22,7 @@ public class JApp extends Application implements Application.ActivityLifecycleCa
 
         registerActivityLifecycleCallbacks(this);
 
+
     }
 
     public static Context getInstance(){
@@ -30,7 +31,6 @@ public class JApp extends Application implements Application.ActivityLifecycleCa
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState){
-        System.out.println("onActivityCreated------------");
     }
 
     @Override
@@ -40,7 +40,6 @@ public class JApp extends Application implements Application.ActivityLifecycleCa
 
     @Override
     public void onActivityResumed(Activity activity){
-        System.out.println("onActivityResumed------------");
 
     }
 
@@ -61,6 +60,5 @@ public class JApp extends Application implements Application.ActivityLifecycleCa
 
     @Override
     public void onActivityDestroyed(Activity activity){
-        System.out.println("onActivityResumed------------");
     }
 }

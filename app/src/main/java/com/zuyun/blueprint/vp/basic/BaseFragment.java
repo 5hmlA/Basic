@@ -7,9 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.blueprint.helper.LogHelper;
 import com.blueprint.widget.LazyFragment;
 import com.zuyun.blueprint.R;
-import com.orhanobut.logger.Logger;
 
 /**
  * @author 江祖赟.
@@ -22,15 +22,15 @@ public class BaseFragment extends LazyFragment {
     @Override
     public View onCreateView(LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
-        View inflate = inflater.inflate(R.layout.main_fm_content, null);
+        View inflate = inflater.inflate(R.layout.jmain_fm_content, null);
         TextView mTempTv = (TextView)inflate.findViewById(R.id.temp_tv);
-        mTempTv.setText("232");
+        mTempTv.setText("BaseFragment");
         return inflate;
     }
 
 
     @Override
     public void firstUserVisibile(){
-        Logger.d("firstUserVisibile---");
+        LogHelper.Log_d("firstUserVisibile---");
     }
 }
