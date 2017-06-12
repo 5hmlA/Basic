@@ -9,15 +9,12 @@ import com.zuyun.blueprint.data.bean.MeiZhi;
 import com.zuyun.blueprint.data.netsource.urlapi.GankService;
 import com.zuyun.blueprint.data.netsource.urlapi.MeiZhiService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * @author 江祖赟.
@@ -71,23 +68,23 @@ public class RecomPresenter implements RecomContract.IRecoPresenter {
                         System.out.println("eeee");
                     }
                 });
-        Single.merge(福利1, meizhi).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io())
-                .subscribe(new Consumer<HttpResult<? extends List<? extends Object>>>() {
-                    @Override
-                    public void accept(
-                            @NonNull HttpResult<? extends List<? extends Object>> httpResult) throws Exception{
-                        List<String> urls = new ArrayList<String>();
-                        urls.add("https://ws1.sinaimg.cn/large/610dc034ly1fgepc1lpvfj20u011i0wv.jpg");
-                        if(httpResult.results.get(0) instanceof GanHuoData) {
-                            HttpResult<List<GanHuoData>> httpResult1 = (HttpResult<List<GanHuoData>>)httpResult;
-                            for(GanHuoData result : httpResult1.results) {
-                                urls.add(result.getUrl());
-                            }
-                        }
-                        mView.addLoopImageHolder(urls);
-                        mView.showSucceed();
-                    }
-                });
+//        Single.merge(福利1, meizhi).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io())
+//                .subscribe(new Consumer<HttpResult<? extends List<? extends Object>>>() {
+//                    @Override
+//                    public void accept(
+//                            @NonNull HttpResult<? extends List<? extends Object>> httpResult) throws Exception{
+//                        List<String> urls = new ArrayList<String>();
+//                        urls.add("https://ws1.sinaimg.cn/large/610dc034ly1fgepc1lpvfj20u011i0wv.jpg");
+//                        if(httpResult.results.get(0) instanceof GanHuoData) {
+//                            HttpResult<List<GanHuoData>> httpResult1 = (HttpResult<List<GanHuoData>>)httpResult;
+//                            for(GanHuoData result : httpResult1.results) {
+//                                urls.add(result.getUrl());
+//                            }
+//                        }
+//                        mView.addLoopImageHolder(urls);
+//                        mView.showSucceed();
+//                    }
+//                });
 
         //        Disposable error = Single
         //                .zip(福利1, meizhi, new BiFunction<HttpResult<List<GanHuoData>>,HttpResult<List<MeiZhi>>,List<Object>>() {

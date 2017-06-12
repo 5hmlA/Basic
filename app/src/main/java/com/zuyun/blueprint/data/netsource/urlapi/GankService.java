@@ -38,7 +38,6 @@ public interface GankService {
      * @param pageIndex
      * @return
      */
-    @Headers("Cache-Control: public, max-age=5")
     @GET("data/{category}/10/{pageIndex}")
     Single<HttpResult<List<GanHuoData>>> getGanHuo(@Path("category") String category
             , @Path("pageIndex") int pageIndex);
@@ -49,6 +48,7 @@ public interface GankService {
      * @param date
      * @return
      */
+    @Headers("Cache-Control: public, max-age=5")
     @GET("day/{date}")
     Single<HttpResult<DailyList>> getRecentlyGanHuo(@Path("date") String date);
 

@@ -53,6 +53,7 @@ public class OkHttpProvider {
         //设置拦截器
         httpClientBuilder.addInterceptor(new UserAgentInterceptor("Android Device"));
         httpClientBuilder.addInterceptor(new LoggingInterceptor());
+
         //        注意：addInterceptor和addNetworkInterceptor 需要同时设置。
         // 如果 只是想实现在线缓存，那么可以只添加网络拦截器，如果只想实现离线缓存，可以使用只添加应用拦截器。
         httpClientBuilder.addInterceptor(cacheControl);
@@ -77,6 +78,7 @@ public class OkHttpProvider {
             Response response = chain.proceed(request);
             if(isConnected()) {
                 int maxAge = 60;//在有网络连接的情况下，一分钟内不再请求网络
+                //接口处可自定义 @Headers("Cache-Control: public, max-age=5")
                 String cacheControl = request.cacheControl().toString();
                 if(TextUtils.isEmpty(cacheControl)) {
                     cacheControl = "public, max-age="+maxAge;
