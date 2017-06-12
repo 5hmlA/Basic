@@ -17,6 +17,7 @@ import android.widget.TextView;
 import java.util.Collections;
 import java.util.List;
 
+import me.drakeet.multitype.ItemViewBinder;
 import me.drakeet.multitype.MultiTypeAdapter;
 
 import static com.blueprint.LibApp.findString;
@@ -294,5 +295,26 @@ public class LoadMoreWrapperAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     protected boolean enableUpMore(){
         return true;
+    }
+
+    @Override
+    public void onViewAttachedToWindow(RecyclerView.ViewHolder holder){
+        super.onViewAttachedToWindow(holder);
+        ItemViewBinder binderByIndex = mInnerAdapter.getBinderByIndex(holder.getItemViewType());
+        System.out.println(holder.getAdapterPosition()+"---onViewAttachedToWindow----"+binderByIndex);
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(RecyclerView recyclerView){
+        super.onDetachedFromRecyclerView(recyclerView);
+
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(RecyclerView.ViewHolder holder){
+        super.onViewDetachedFromWindow(holder);
+
+        ItemViewBinder binderByIndex = mInnerAdapter.getBinderByIndex(holder.getItemViewType());
+        System.out.println(holder.getAdapterPosition()+"---onViewAttachedToWindow----"+binderByIndex);
     }
 }

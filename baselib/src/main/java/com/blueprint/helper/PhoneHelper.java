@@ -8,6 +8,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
@@ -80,14 +82,14 @@ public class PhoneHelper {
     }
 
 
-    //    /**
-    //     * 手机MAC地址
-    //     */
-    //    public static String getMacAddressInfo(Context context) {
-    //        WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-    //        WifiInfo info = manager.getConnectionInfo();
-    //        return info.getMacAddress();
-    //    }
+        /**
+         * 手机MAC地址
+         */
+        public static String getMacAddressInfo(Context context) {
+            WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+            WifiInfo info = manager.getConnectionInfo();
+            return info.getMacAddress();
+        }
 
     /** 获得设备ip地址 */
     public static String getLocalAddress(){

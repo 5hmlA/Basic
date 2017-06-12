@@ -26,12 +26,8 @@ public class FeaturedFrgmt extends AbsListFrgmt {
 
     @Override
     protected void register2Adapter(MultiTypeAdapter multiTypeAdapter){
-        multiTypeAdapter.register(ItemChangeMoudle.class,new ItemChangeMoudleBinder(null));
-        multiTypeAdapter.register(ItemRecomWorm.class,new ItemRecomWormBinder());
-        mListData.add(new ItemRecomWorm.ItemRecomWormBuilder().setAdvDesc("测试").build());
-        mListData.add(new ItemRecomWorm.ItemRecomWormBuilder().build());
-        mListData.add(new ItemChangeMoudle("第一个"));
-        mListData.add(new ItemChangeMoudle("第二个"));
+        multiTypeAdapter.register(ItemChangeMoudle.class, new ItemChangeMoudleBinder(null));
+        multiTypeAdapter.register(ItemRecomWorm.class, new ItemRecomWormBinder());
     }
 
     @Override
@@ -73,6 +69,12 @@ public class FeaturedFrgmt extends AbsListFrgmt {
             @Override
             public void run(){
                 mMultiStateLayout.showStateSucceed();
+                mRecvAdapter.addItem(new ItemChangeMoudle("第二个"), 0);
+                mRecvAdapter.addItem(new ItemChangeMoudle("第二44444"), 0);
+                mRecvAdapter.addItem(new ItemRecomWorm.ItemRecomWormBuilder().setAdvDesc("测试").build(), 0);
+                mRecvAdapter.addItem(new ItemRecomWorm.ItemRecomWormBuilder().build(), 0);
+                mRecvAdapter.addItem(new ItemChangeMoudle("第一个"), 0);
+                mRecvAdapter.addItem(new ItemChangeMoudle("第二个"), 0);
             }
         }, 2000);
     }

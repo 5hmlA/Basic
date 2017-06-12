@@ -14,6 +14,7 @@
 
     <jonas.jlayout.MultiStateLayout
         android:id="@+id/common_frgmt_content"
+        android:animateLayoutChanges="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

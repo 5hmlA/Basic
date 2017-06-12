@@ -56,12 +56,12 @@ public abstract class BaseTitleFrgmt extends BaseFragment {
     private void initStableViews(){
         //标题内容
         setTextView(mTitleBar.getTitleTextView(), setTitle());
-        //        //空页面提示信息
-        //        setTextView(mMultiStateLayout.getEmptyLayout(), R.id.j_multity_empt_msg, setEmptMsg());
-        //        setTextView(mMultiStateLayout.getEmptyLayout(), R.id.j_multity_retry, setEmptRetryMsg());
-        //        //错误页面提示信息
-        //        setTextView(mMultiStateLayout.getErrorLayout(), R.id.j_multity_error_msg, setErrorMsg());
-        //        setTextView(mMultiStateLayout.getErrorLayout(), R.id.j_multity_retry, setErrorRetryMsg());
+        //空页面提示信息
+        setTextView(mMultiStateLayout.getEmptyLayout(), R.id.j_multity_empt_msg, setEmptMsg());
+        setTextView(mMultiStateLayout.getEmptyLayout(), R.id.j_multity_retry, setEmptRetryMsg());
+        //错误页面提示信息
+        setTextView(mMultiStateLayout.getErrorLayout(), R.id.j_multity_error_msg, setErrorMsg());
+        setTextView(mMultiStateLayout.getErrorLayout(), R.id.j_multity_retry, setErrorRetryMsg());
 
         setClicks();
 

@@ -28,7 +28,7 @@ public abstract class AbsListFrgmt extends BaseTitleFrgmt implements SwipeRefres
     @BindView(R.id.common_recv) public RecyclerView mCommonRecv;
     @BindView(R.id.common_swipe) public SwipeRefreshLayout mSwipeRefreshLayout;
     public List mListData = new ArrayList();
-    private LoadMoreWrapperAdapter mRecvAdapter;
+    public LoadMoreWrapperAdapter mRecvAdapter;
 
     @Override
     protected boolean requestNoTitleBar(){

@@ -5,10 +5,13 @@ import android.content.Context;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import com.blueprint.LibApp;
+
 /**
  * Created by _SOLID
- * Date:2016/5/5
- * Time:9:30
+ *
+ * 通过hook监听系统键盘显示
+ * https://github.com/pqpo/InputMethodHolder
  */
 public final class KeyboardHelper {
     private KeyboardHelper() {
@@ -36,6 +39,14 @@ public final class KeyboardHelper {
                 activity.getCurrentFocus().clearFocus();
             }
         }
+    }
+    /**
+     * 切换键盘显示与否状态
+     */
+    public static void toggleSoftInput() {
+        InputMethodManager imm = (InputMethodManager) LibApp.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm == null) return;
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }
 
     public static void hideKeyboard(Activity activity, View view) {
