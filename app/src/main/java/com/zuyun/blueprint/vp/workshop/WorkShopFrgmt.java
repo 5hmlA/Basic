@@ -35,7 +35,7 @@ public class WorkShopFrgmt extends BaseTabViewpagerFrgmt {
 
     @Override
     public String setTitle(){
-        return "工坊";
+        return null;
     }
 
     public static class WorkShopFrgmtProvider extends BaseFrgmtFractory {

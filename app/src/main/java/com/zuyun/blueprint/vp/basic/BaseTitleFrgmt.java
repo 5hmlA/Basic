@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
-import com.blueprint.helper.StrHelper;
 import com.blueprint.widget.JTitleBar;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.zuyun.blueprint.R;
@@ -47,6 +46,7 @@ public abstract class BaseTitleFrgmt extends BaseFragment {
 
     /**
      * 默认 有titlebar
+     *
      * @return
      */
     protected boolean requestNoTitleBar(){
@@ -55,14 +55,13 @@ public abstract class BaseTitleFrgmt extends BaseFragment {
 
     private void initStableViews(){
         //标题内容
-        mTitleBar.setTitle(StrHelper.nullStrToEmpty(setTitle()));
-
-        //空页面提示信息
-        setTextView(mMultiStateLayout.getEmptyLayout(), R.id.j_multity_empt_msg, setEmptMsg());
-        setTextView(mMultiStateLayout.getEmptyLayout(), R.id.j_multity_retry, setEmptRetryMsg());
-        //错误页面提示信息
-        setTextView(mMultiStateLayout.getErrorLayout(), R.id.j_multity_error_msg, setErrorMsg());
-        setTextView(mMultiStateLayout.getErrorLayout(), R.id.j_multity_retry, setErrorRetryMsg());
+        setTextView(mTitleBar.getTitleTextView(), setTitle());
+        //        //空页面提示信息
+        //        setTextView(mMultiStateLayout.getEmptyLayout(), R.id.j_multity_empt_msg, setEmptMsg());
+        //        setTextView(mMultiStateLayout.getEmptyLayout(), R.id.j_multity_retry, setEmptRetryMsg());
+        //        //错误页面提示信息
+        //        setTextView(mMultiStateLayout.getErrorLayout(), R.id.j_multity_error_msg, setErrorMsg());
+        //        setTextView(mMultiStateLayout.getErrorLayout(), R.id.j_multity_retry, setErrorRetryMsg());
 
         setClicks();
     }
@@ -134,6 +133,7 @@ public abstract class BaseTitleFrgmt extends BaseFragment {
 
     /**
      * 将布局添加到 container中
+     *
      * @param inflater
      * @param container
      */

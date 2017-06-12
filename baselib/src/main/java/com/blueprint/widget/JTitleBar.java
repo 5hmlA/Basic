@@ -104,4 +104,8 @@ public class JTitleBar extends RelativeLayout {
     public ImageView getRightIcon(){
         return mJtitlebarRightButton;
     }
+
+    public TextView getTitleTextView(){
+        return mJtitlebarTitle;
+    }
 }

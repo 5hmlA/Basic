@@ -12,8 +12,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.blueprint.helper.CheckHelper;
-
 
 public class LibApp {
 
@@ -87,19 +85,23 @@ public class LibApp {
     }
 
     public static void setTextView(TextView tv, CharSequence charSequence){
-        tv.setText(charSequence);
+        if(tv != null && !TextUtils.isEmpty(charSequence)) {
+            tv.setText(charSequence);
+        }
+    }
+
+    public static void setImageSrc(ImageView iv, Drawable drawable){
+        if(iv != null && drawable != null) {
+            iv.setImageDrawable(drawable);
+        }
     }
 
     public static void setTextView(@NonNull View rootView, int id, int resStr){
-        if(!TextUtils.isEmpty(findString(resStr)) && CheckHelper.checkObjects(rootView.findViewById(id))) {
-            ( (TextView)rootView.findViewById(id) ).setText(findString(resStr));
-        }
+        setTextView((TextView)rootView.findViewById(id), findString(resStr));
     }
 
     public static void setImageSrc(@NonNull View rootView, int id, int resStr){
-        if(!TextUtils.isEmpty(findString(resStr)) && CheckHelper.checkObjects(rootView.findViewById(id))) {
-            ( (ImageView)rootView.findViewById(id) ).setImageResource(resStr);
-        }
+        setImageSrc((ImageView)rootView.findViewById(id), ContextCompat.getDrawable(getContext(), resStr));
     }
 
     public static void setDebugConfig(boolean inDebug){

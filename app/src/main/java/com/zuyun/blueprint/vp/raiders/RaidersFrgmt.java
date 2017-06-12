@@ -25,7 +25,7 @@ public class RaidersFrgmt extends BaseTabViewpagerFrgmt {
 
     @Override
     public String setTitle(){
-        return "攻略";
+        return null;
     }
 
     @Override

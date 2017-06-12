@@ -10,8 +10,6 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/baselib" />
-            <option value="$PROJECT_DIR$/jtabstrip" />
-            <option value="$PROJECT_DIR$/multitstatelayout" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

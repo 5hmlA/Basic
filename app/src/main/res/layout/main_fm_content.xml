@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:fitsSystemWindows="false"
-        app:leftIcon="@mipmap/ic_launcher"
+        app:leftIcon="@drawable/ic_search_white_24dp"
         android:background="?attr/colorPrimary"/>
 
     <TextView

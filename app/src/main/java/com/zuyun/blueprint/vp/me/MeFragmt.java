@@ -20,6 +20,6 @@ public class MeFragmt extends BaseTitleFrgmt {
 
     @Override
     protected String setTitle(){
-        return "我";
+        return null;
     }
 }

@@ -19,6 +19,6 @@ public class LiveFrgmt extends BaseTitleFrgmt {
 
     @Override
     protected String setTitle(){
-        return "直播";
+        return null;
     }
 }

@@ -33,7 +33,7 @@ dependencies {
     compile thirdLibs.rxandroid
 
     compile thirdLibs.jtabstrip
-    compile project(':multitstatelayout')
+    compile 'com.yun.ospl:multitstatelayout:1.6@aar'
     compile('me.drakeet.multitype:multitype:3.0.1', {
         exclude group: 'com.android.support'
     })

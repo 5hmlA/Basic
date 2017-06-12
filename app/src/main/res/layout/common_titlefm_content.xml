@@ -9,7 +9,7 @@
         android:id="@+id/home_titlebar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leftIcon="@mipmap/ic_launcher"
+        app:leftIcon="@drawable/ic_search_white_24dp"
         android:background="?attr/colorPrimary"/>
 
     <jonas.jlayout.MultiStateLayout

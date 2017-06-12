@@ -19,6 +19,6 @@ public class DynamicFrgmt extends BaseTitleFrgmt {
 
     @Override
     protected String setTitle(){
-        return "动态";
+        return null;
     }
 }
