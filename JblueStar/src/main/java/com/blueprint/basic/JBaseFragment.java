@@ -1,4 +1,4 @@
-package com.zuyun.blueprint.vp.basic;
+package com.blueprint.basic;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -7,16 +7,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.blueprint.R;
 import com.blueprint.helper.LogHelper;
 import com.blueprint.widget.LazyFragment;
-import com.zuyun.blueprint.R;
 
 /**
  * @author 江祖赟.
  * @date 2017/6/7
  * @des [一句话描述]
  */
-public class BaseFragment extends LazyFragment {
+public class JBaseFragment extends LazyFragment {
 
     @Nullable
     @Override
@@ -24,7 +24,7 @@ public class BaseFragment extends LazyFragment {
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
         View inflate = inflater.inflate(R.layout.jmain_fm_content, null);
         TextView mTempTv = (TextView)inflate.findViewById(R.id.temp_tv);
-        mTempTv.setText("BaseFragment");
+        mTempTv.setText("JBaseFragment");
         return inflate;
     }
 

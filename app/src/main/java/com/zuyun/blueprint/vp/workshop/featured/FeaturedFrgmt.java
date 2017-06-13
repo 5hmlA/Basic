@@ -5,7 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
 import com.blueprint.adapter.RecyclerHolder;
-import com.zuyun.blueprint.vp.basic.AbsListFrgmt;
+import com.zuyun.blueprint.vp.basic.JAbsListFrgmt;
 import com.zuyun.blueprint.vp.workshop.recommend.itemholderbinder.ItemChangeMoudleBinder;
 import com.zuyun.blueprint.vp.workshop.recommend.itemholderbinder.ItemRecomWormBinder;
 import com.zuyun.blueprint.vp.workshop.recommend.itemholderbinder.bean.ItemChangeMoudle;
@@ -18,7 +18,7 @@ import me.drakeet.multitype.MultiTypeAdapter;
  * @date 2017/6/7
  * @des [精选]
  */
-public class FeaturedFrgmt extends AbsListFrgmt {
+public class FeaturedFrgmt extends JAbsListFrgmt {
     @Override
     protected RecyclerView.LayoutManager setLayoutManager(){
         return new LinearLayoutManager(getContext());

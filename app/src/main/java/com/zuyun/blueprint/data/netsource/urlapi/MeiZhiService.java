@@ -23,6 +23,7 @@ public interface MeiZhiService {
 
     @GET("data/福利/20/{pageindex}")
     Flowable<HttpResult<List<MeiZhi>>> getMeizhi2(@Path("pageindex") int page);
+
     /***
      * 根据类别查询干货
      * @param pageIndex

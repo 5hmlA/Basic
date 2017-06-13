@@ -2,7 +2,7 @@ package com.zuyun.blueprint.vp.raiders;
 
 import android.support.v4.app.Fragment;
 
-import com.zuyun.blueprint.vp.basic.BaseTabViewpagerFrgmt;
+import com.zuyun.blueprint.vp.basic.JBaseTabViewpagerFrgmt;
 import com.zuyun.blueprint.vp.raiders.experience.ExperienceFrgmt;
 import com.zuyun.blueprint.vp.raiders.news.NewsFrgmt;
 import com.zuyun.blueprint.vp.raiders.question.QuestionFrgmt;
@@ -19,7 +19,7 @@ import butterknife.BindArray;
  * @date 2017/6/7
  * @des [攻略]
  */
-public class RaidersFrgmt extends BaseTabViewpagerFrgmt {
+public class RaidersFrgmt extends JBaseTabViewpagerFrgmt {
 
     @BindArray(R.array.titles_sec_raiders) String[] mTabTitles;
 

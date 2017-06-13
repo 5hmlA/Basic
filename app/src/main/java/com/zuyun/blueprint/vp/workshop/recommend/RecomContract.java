@@ -1,7 +1,7 @@
 package com.zuyun.blueprint.vp.workshop.recommend;
 
-import com.zuyun.blueprint.vp.basic.BasePresenter;
-import com.zuyun.blueprint.vp.basic.BaseView;
+import com.zuyun.blueprint.vp.basic.JBasePresenter;
+import com.zuyun.blueprint.vp.basic.JBaseView;
 
 import java.util.List;
 
@@ -11,13 +11,13 @@ import java.util.List;
  * @des [一句话描述]
  */
 public class RecomContract {
-    interface IRecomView extends BaseView{
+    interface IRecomView extends JBaseView {
         void addLoopImageHolder(List<String> urls);
         void addUpdateHolder(boolean addHolder);
         void addHotHolder();
         void addUnstableHolder();
     }
-    interface IRecoPresenter extends BasePresenter {
+    interface IRecoPresenter extends JBasePresenter {
 
         void loadLoopImage();
 

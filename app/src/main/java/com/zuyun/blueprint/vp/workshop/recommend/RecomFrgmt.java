@@ -10,7 +10,7 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.zuyun.blueprint.Constants;
-import com.zuyun.blueprint.vp.basic.BaseTitleFrgmt;
+import com.zuyun.blueprint.vp.basic.JBaseTitleFrgmt;
 import com.zuyun.blueprint.vp.workshop.recommend.itemholderbinder.ItemChangeMoudleBinder;
 import com.zuyun.blueprint.vp.workshop.recommend.itemholderbinder.ItemLoopImageBinder;
 import com.zuyun.blueprint.vp.workshop.recommend.itemholderbinder.ItemRecomWormBinder;
@@ -32,7 +32,7 @@ import me.drakeet.multitype.MultiTypeAdapter;
  * @date 2017/6/7
  * @des [推荐]
  */
-public class RecomFrgmt extends BaseTitleFrgmt implements RecomContract.IRecomView {
+public class RecomFrgmt extends JBaseTitleFrgmt implements RecomContract.IRecomView {
     @BindView(R.id.common_recv) RecyclerView mCommonRecv;
     private RecomPresenter mRecomPresenter;
     private List mListData;

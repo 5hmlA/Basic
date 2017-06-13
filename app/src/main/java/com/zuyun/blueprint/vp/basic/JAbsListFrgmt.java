@@ -24,7 +24,7 @@ import me.drakeet.multitype.MultiTypeAdapter;
  * @date 2017/6/7
  * @des [推荐]
  */
-public abstract class AbsListFrgmt extends BaseTitleFrgmt implements SwipeRefreshLayout.OnRefreshListener, LoadMoreWrapperAdapter.OnMoreloadListener {
+public abstract class JAbsListFrgmt extends JBaseTitleFrgmt implements SwipeRefreshLayout.OnRefreshListener, LoadMoreWrapperAdapter.OnMoreloadListener {
     @BindView(R.id.common_recv) public RecyclerView mCommonRecv;
     @BindView(R.id.common_swipe) public SwipeRefreshLayout mSwipeRefreshLayout;
     public List mListData = new ArrayList();
@@ -37,7 +37,7 @@ public abstract class AbsListFrgmt extends BaseTitleFrgmt implements SwipeRefres
 
     @Override
     protected void onCreateContent(LayoutInflater inflater, RelativeLayout container){
-        View rootView = inflater.inflate(R.layout.common_abslist, container);
+        View rootView = inflater.inflate(R.layout.jcommon_abslist, container);
         ButterKnife.bind(this, rootView);
         initRecView();
         initSwipeLayout();

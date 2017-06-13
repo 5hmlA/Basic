@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.view.Gravity;
 
-import com.zuyun.blueprint.vp.basic.BaseActivity;
+import com.zuyun.blueprint.vp.basic.JBaseActivity;
 import com.zuyun.blueprint.vp.dynamic.DynamicFrgmt;
 import com.zuyun.blueprint.vp.live.LiveFrgmt;
 import com.zuyun.blueprint.vp.me.MeFragmt;
@@ -27,7 +27,7 @@ import butterknife.ButterKnife;
 
 import static com.blueprint.LibApp.findDimens;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends JBaseActivity {
     @BindView(R.id.main_tab_buttom_strip) JPagerSlidingTabStrip mButtomTabStrip;
     @BindView(R.id.main_tab_pager) ViewPager mViewPager;
     @BindArray(R.array.titles_home_buttom) String[] mTitles;

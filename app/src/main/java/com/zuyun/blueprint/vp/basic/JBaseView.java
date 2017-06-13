@@ -7,7 +7,7 @@ import com.zuyun.blueprint.Constants;
  * @date 2017/6/6
  * @des [一句话描述]
  */
-public interface BaseView {
+public interface JBaseView {
 
     void showLoading();
 

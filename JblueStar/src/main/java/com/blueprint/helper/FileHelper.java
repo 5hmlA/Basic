@@ -307,7 +307,7 @@ public class FileHelper {
         if(file == null || !file.exists()) {
             return;
         }
-        if(file.isDirectory()) {
+        if(file.isDirectory() && file.listFiles() != null) {
             for(File child : file.listFiles()) {
                 doClearFile(child);
             }
@@ -334,6 +334,9 @@ public class FileHelper {
         }
         long dirSize = 0;
         File[] files = dir.listFiles();
+        if(files == null) {
+            return 0;
+        }
         for(File file : files) {
             if(file.isFile()) {
                 dirSize += file.length();
@@ -367,34 +370,45 @@ public class FileHelper {
     /**
      * 重命名文件
      *
-     * @param filePath 文件路径
-     * @param newName  新名称
+     * @param filePath
+     *         文件路径
+     * @param newName
+     *         新名称
      * @return {@code true}: 重命名成功<br>{@code false}: 重命名失败
      */
-    public static boolean rename(@NonNull String filePath, String newName) {
+    public static boolean rename(@NonNull String filePath, String newName){
         return rename(new File(filePath), newName);
     }
 
     /**
      * 重命名文件
      *
-     * @param file    文件
-     * @param newName 新名称
+     * @param file
+     *         文件
+     * @param newName
+     *         新名称
      * @return {@code true}: 重命名成功<br>{@code false}: 重命名失败
      */
-    public static boolean rename(File file, String newName) {
+    public static boolean rename(File file, String newName){
         // 文件为空返回false
-        if (file == null) return false;
+        if(file == null) {
+            return false;
+        }
         // 文件不存在返回false
-        if (!file.exists()) return false;
+        if(!file.exists()) {
+            return false;
+        }
         // 新的文件名为空返回false
-        if (TextUtils.isEmpty(newName)) return false;
+        if(TextUtils.isEmpty(newName)) {
+            return false;
+        }
         // 如果文件名没有改变返回true
-        if (newName.equals(file.getName())) return true;
-        File newFile = new File(file.getParent() + File.separator + newName);
+        if(newName.equals(file.getName())) {
+            return true;
+        }
+        File newFile = new File(file.getParent()+File.separator+newName);
         // 如果重命名的文件已存在返回false
-        return !newFile.exists()
-                && file.renameTo(newFile);
+        return !newFile.exists() && file.renameTo(newFile);
     }
 
     //todo  移动复制

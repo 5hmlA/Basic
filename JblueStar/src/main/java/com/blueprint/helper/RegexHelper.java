@@ -27,7 +27,7 @@ public class RegexHelper {
      */
     public static boolean isPhoneNumber(String handset) {
         try {
-            if (!handset.substring(0, 1).equals("1")) {
+            if (!"1".equals(handset.substring(0, 1))) {
                 return false;
             }
             if (handset == null || handset.length() != 11) {

@@ -6,14 +6,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.zuyun.blueprint.vp.basic.BaseFragment;
+import com.zuyun.blueprint.vp.basic.JBaseFragment;
 
 /**
  * @author 江祖赟.
  * @date 2017/6/7
  * @des [小编推荐]
  */
-public class RecomFrgmt extends BaseFragment {
+public class RecomFrgmt extends JBaseFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState){
         super.onCreate(savedInstanceState);

@@ -22,7 +22,7 @@ import jonas.jlayout.MultiStateLayout;
  * @date 2017/6/7
  * @des [具体内容由viewpager的fragment展示 此fragment只做容器装tabstrip + viewpager]
  */
-public abstract class BaseTabViewpagerFrgmt extends BaseTitleFrgmt {
+public abstract class JBaseTabViewpagerFrgmt extends JBaseTitleFrgmt {
 
 
     @BindView(R.id.sec_tab_strip) public JPagerSlidingTabStrip mSecTabStrip;

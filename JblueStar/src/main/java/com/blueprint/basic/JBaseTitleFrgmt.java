@@ -1,4 +1,4 @@
-package com.zuyun.blueprint.vp.basic;
+package com.blueprint.basic;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -7,9 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import com.blueprint.R;
 import com.blueprint.widget.JTitleBar;
 import com.jakewharton.rxbinding2.view.RxView;
-import com.zuyun.blueprint.R;
 
 import java.util.concurrent.TimeUnit;
 
@@ -24,10 +24,10 @@ import static com.blueprint.LibApp.setTextView;
  * @date 2017/6/7
  * @des [标题+状态界面  有统一处理 basePresenter的subscribe和unsubscribe]
  */
-public abstract class BaseTitleFrgmt extends BaseFragment {
+public abstract class JBaseTitleFrgmt extends JBaseFragment {
     public MultiStateLayout mMultiStateLayout;
     public JTitleBar mTitleBar;
-    public BasePresenter mBasePresenter;
+    public JBasePresenter mBasePresenter;
 
     @Nullable
     @Override

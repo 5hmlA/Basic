@@ -2,7 +2,7 @@ package com.zuyun.blueprint.vp.workshop;
 
 import android.support.v4.app.Fragment;
 
-import com.zuyun.blueprint.vp.basic.BaseTabViewpagerFrgmt;
+import com.zuyun.blueprint.vp.basic.JBaseTabViewpagerFrgmt;
 import com.zuyun.blueprint.vp.workshop.featured.FeaturedFrgmt;
 import com.zuyun.blueprint.vp.workshop.material.MaterialFrgmt;
 import com.zuyun.blueprint.vp.workshop.online.OnlineFrgmt;
@@ -20,7 +20,7 @@ import butterknife.BindArray;
  * @date 2017/6/7
  * @des [工坊]
  */
-public class WorkShopFrgmt extends BaseTabViewpagerFrgmt {
+public class WorkShopFrgmt extends JBaseTabViewpagerFrgmt {
 
     @BindArray(R.array.titles_sec_workshop) String[] mTabTitles;
 
