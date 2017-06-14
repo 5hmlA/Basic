@@ -46,6 +46,7 @@ public class OkHttpProvider {
         //设置超时时间
         httpClientBuilder.connectTimeout(DEFAULT_CONNECT_TIMEOUT, TimeUnit.SECONDS);
         httpClientBuilder.writeTimeout(DEFAULT_WRITE_TIMEOUT, TimeUnit.SECONDS);
+        httpClientBuilder.retryOnConnectionFailure(true);
         httpClientBuilder.readTimeout(DEFAULT_READ_TIMEOUT, TimeUnit.SECONDS);
         //设置缓存
         File httpCacheDirectory = new File(LibApp.getContext().getCacheDir(), OKHTTPCACHE);

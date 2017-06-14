@@ -4,6 +4,7 @@ package com.zuyun.blueprint.vp.me;
 import android.view.LayoutInflater;
 import android.widget.RelativeLayout;
 
+import com.zuyun.blueprint.R;
 import com.zuyun.blueprint.vp.basic.JBaseTitleFrgmt;
 
 /**
@@ -14,6 +15,8 @@ import com.zuyun.blueprint.vp.basic.JBaseTitleFrgmt;
 public class MeFragmt extends JBaseTitleFrgmt {
     @Override
     protected void onCreateContent(LayoutInflater inflater, RelativeLayout container){
+
+        inflater.inflate(R.layout.main_me,container);
         mMultiStateLayout.showStateSucceed();
 
     }

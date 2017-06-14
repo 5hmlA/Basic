@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Basic.iml" filepath="$PROJECT_DIR$/Basic.iml" />
       <module fileurl="file://$PROJECT_DIR$/JblueStar/JblueStar.iml" filepath="$PROJECT_DIR$/JblueStar/JblueStar.iml" />
-      <module fileurl="file://$PROJECT_DIR$/JblueStar/JblueStar.iml" filepath="$PROJECT_DIR$/JblueStar/JblueStar.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

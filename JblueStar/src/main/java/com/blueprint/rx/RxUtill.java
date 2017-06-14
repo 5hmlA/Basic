@@ -10,6 +10,7 @@ import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.SingleTransformer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -55,5 +56,11 @@ public class RxUtill {
                 return upstream.observeOn(Schedulers.io()).subscribeOn(Schedulers.io());
             }
         };
+    }
+
+    public static void dispose(Disposable disposable) {
+        if (disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+        }
     }
 }

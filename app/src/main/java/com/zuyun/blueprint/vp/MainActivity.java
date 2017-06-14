@@ -1,22 +1,25 @@
 package com.zuyun.blueprint.vp;
 
+import android.Manifest;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.view.Gravity;
+import android.view.View;
 
+import com.blueprint.adapter.frgmt.BaseFrgmtFractory;
+import com.blueprint.adapter.frgmt.TabAdapter;
+import com.blueprint.rx.RxBus;
+import com.tbruyelle.rxpermissions2.RxPermissions;
+import com.zuyun.blueprint.R;
 import com.zuyun.blueprint.vp.basic.JBaseActivity;
 import com.zuyun.blueprint.vp.dynamic.DynamicFrgmt;
 import com.zuyun.blueprint.vp.live.LiveFrgmt;
 import com.zuyun.blueprint.vp.me.MeFragmt;
 import com.zuyun.blueprint.vp.raiders.RaidersFrgmt;
 import com.zuyun.blueprint.vp.workshop.WorkShopFrgmt;
-import com.blueprint.adapter.frgmt.BaseFrgmtFractory;
-import com.blueprint.adapter.frgmt.TabAdapter;
-import com.blueprint.rx.RxBus;
-import com.zuyun.blueprint.R;
 
 import april.yun.ISlidingTabStrip;
 import april.yun.JPagerSlidingTabStrip;
@@ -47,6 +50,8 @@ public class MainActivity extends JBaseActivity {
         mViewPager.setAdapter(new ButtomPagerAdapter(getSupportFragmentManager(),mTitles,new HomeFrgmtProvider()));
         mButtomTabStrip.bindViewPager(mViewPager);
         mViewPager.setOffscreenPageLimit(mTitles.length);
+
+        new RxPermissions(this).request(Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe();
     }
 
     private void initTagStrip(){
@@ -133,5 +138,10 @@ public class MainActivity extends JBaseActivity {
     @Override
     public void onBackPressed(){
         doubleExit();
+    }
+
+    public void testClick(View v){
+
+        
     }
 }
