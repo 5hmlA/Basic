@@ -1,5 +1,7 @@
 package com.blueprint;
 
+import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
@@ -14,6 +16,8 @@ import android.widget.TextView;
 
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
+
+import java.util.List;
 
 
 public class LibApp {
@@ -120,6 +124,27 @@ public class LibApp {
 
     public static boolean isInDebug(){
         return sInDebug;
+    }
+
+    /**
+     * whether application is in background
+     * <ul>
+     * <li>need use permission android.permission.GET_TASKS in Manifest.xml</li>
+     * </ul>
+     *
+     * @param context
+     * @return if application is in background return true, otherwise return false
+     */
+    public static boolean isApplicationInBackground(Context context) {
+        ActivityManager am = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningTaskInfo> taskList = am.getRunningTasks(1);
+        if (taskList != null && !taskList.isEmpty()) {
+            ComponentName topActivity = taskList.get(0).topActivity;
+            if (topActivity != null && !topActivity.getPackageName().equals(context.getPackageName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

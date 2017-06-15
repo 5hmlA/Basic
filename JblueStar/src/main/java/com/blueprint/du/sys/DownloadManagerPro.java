@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 
 import com.blueprint.LibApp;
 
@@ -21,8 +22,6 @@ import java.lang.reflect.Method;
  * <li>{@link #getFileName(long)} get download file name</li>
  * <li>{@link #getUri(long)} get download uri</li>
  * <li>{@link #getReason(long)} get failed code or paused reason</li>
- * <li>{@link #getPausedReason(long)} get paused reason</li>
- * <li>{@link #getErrorCode(long)} get failed error code</li>
  * </ul>
  * <ul>
  * <strong>Operate download</strong>
@@ -71,8 +70,26 @@ public class DownloadManagerPro {
         return Inner.sDownloadManagerPro;
     }
 
-    public void startDownload(DownloadManager.Request request){
-        mDownloadManager.enqueue(request);
+    public long startDownload(DownloadManager.Request request){
+        return mDownloadManager.enqueue(request);
+    }
+
+    public long downloadApp(String url, String saveName, String title, boolean onlyWify){
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, saveName);
+//        request.setDestinationInExternalPublicDir(FileHelper.getCacheDir().getAbsolutePath(), saveName);
+        request.setTitle(title);
+        //表示下载进行中和下载完成的通知栏是否显示。默认只显示下载中通知。VISIBILITY_VISIBLE_NOTIFY_COMPLETED表示下载完成后显示通知栏提示
+        //request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        /**设置下载文件的类型*/
+        request.setMimeType("application/vnd.android.package-archive");
+        //表示允许MediaScanner扫描到这个文件，默认不允许。
+        //        request.allowScanningByMediaScanner();
+        //表示下载允许的网络类型，默认在任何网络下都允许下载
+        if(onlyWify) {
+            request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI);
+        }
+        return startDownload(request);
     }
 
     /**
@@ -148,6 +165,7 @@ public class DownloadManagerPro {
         }
         return 0;
     }
+
     /**
      * get downloaded byte, total byte and download status
      *
@@ -159,7 +177,7 @@ public class DownloadManagerPro {
      * </ul>
      */
     public int[] getBytesAndStatus(DownloadManager.Query query){
-        int[] bytesAndStatus = new int[]{-1, -1, 0};
+        int[] bytesAndStatus = new int[]{-1, -1, -100};
         Cursor c = null;
         try {
             c = mDownloadManager.query(query);
@@ -307,8 +325,6 @@ public class DownloadManagerPro {
      * @param downloadId
      * @return <ul>
      * <li>if status of downloadId is {@link DownloadManager#STATUS_PAUSED}, return
-     * {@link #getPausedReason(long)}</li>
-     * <li>if status of downloadId is {@link DownloadManager#STATUS_FAILED}, return {@link #getErrorCode(long)}</li>
      * <li>if status of downloadId is neither {@link DownloadManager#STATUS_PAUSED} nor
      * {@link DownloadManager#STATUS_FAILED}, return 0</li>
      * </ul>

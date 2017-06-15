@@ -4,8 +4,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 
-import com.blueprint.LibApp;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,7 +29,7 @@ public abstract class DownLoadSubscribe implements SingleObserver<ResponseBody> 
     private long fileSize = 0;
 
     public DownLoadSubscribe(@NonNull String fileName) {
-        mSaveFilePath = getCacheDir(LibApp.getContext()).getAbsolutePath();
+        mSaveFilePath = getCacheDir().getAbsolutePath();
         mFile = new File(mSaveFilePath + File.separator + fileName);
     }
 

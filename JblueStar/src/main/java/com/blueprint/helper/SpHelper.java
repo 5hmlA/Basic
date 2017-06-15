@@ -24,7 +24,7 @@ public class SpHelper {
     /**
      * 保存在手机里面的文件名
      */
-    public static final String FILE_NAME = "share_data";
+    public static final String FILE_NAME = "jshare_data";
     private SharedPreferences msp;
     private SharedPreferences.Editor editor;
 
@@ -63,13 +63,12 @@ public class SpHelper {
      * 默认存储名 share_data
      * MODE_PRIVATE
      *
-     * @param context
      * @param key
      * @param object
      */
-    public static void put(Context context, String key, Object object){
+    public static void sput(String key, Object object){
 
-        SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+        SharedPreferences sp = LibApp.getContext().getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
 
         if(object instanceof String) {
@@ -146,13 +145,12 @@ public class SpHelper {
      * 得到保存数据的方法，我们根据默认值得到保存的数据的具体类型，然后调用相对于的方法获取值
      * MODE_PRIVATE
      *
-     * @param context
      * @param key
      * @param defaultObject
      * @return
      */
-    public static Object get(Context context, String key, Object defaultObject){
-        SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+    public static Object sget(String key, Object defaultObject){
+        SharedPreferences sp = LibApp.getContext().getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
 
         if(defaultObject instanceof String) {
             return sp.getString(key, (String)defaultObject);
@@ -188,12 +186,10 @@ public class SpHelper {
     /**
      * 移除某个key值已经对应的值
      * MODE_PRIVATE
-     *
-     * @param context
      * @param key
      */
-    public static void remove(Context context, String key){
-        SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+    public static void sremove(String key){
+        SharedPreferences sp = LibApp.getContext().getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.remove(key);
         SharedPreferencesCompat.apply(editor);
@@ -214,10 +210,9 @@ public class SpHelper {
     /**
      * 清除所有数据
      *
-     * @param context
      */
-    public static void clear(Context context){
-        SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+    public static void sclear(){
+        SharedPreferences sp = LibApp.getContext().getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.clear();
         SharedPreferencesCompat.apply(editor);
@@ -234,12 +229,11 @@ public class SpHelper {
     /**
      * 查询某个key是否已经存在
      *
-     * @param context
      * @param key
      * @return
      */
-    public static boolean contains(Context context, String key){
-        SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+    public static boolean scontains(String key){
+        SharedPreferences sp = LibApp.getContext().getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         return sp.contains(key);
     }
 /**
@@ -255,11 +249,10 @@ public class SpHelper {
     /**
      * 返回所有的键值对
      *
-     * @param context
      * @return
      */
-    public static Map<String,?> getAll(Context context){
-        SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+    public static Map<String,?> sgetAll(){
+        SharedPreferences sp = LibApp.getContext().getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         return sp.getAll();
     }
   /**

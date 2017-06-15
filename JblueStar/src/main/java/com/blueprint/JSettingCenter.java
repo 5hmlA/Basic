@@ -10,7 +10,7 @@ import io.reactivex.Single;
 import static com.blueprint.helper.FileHelper.clearFile;
 import static com.blueprint.helper.FileHelper.getDirSize;
 
-public class SettingCenter {
+public class JSettingCenter {
 
     public static Set<String> sMsaveDataUrls = new HashSet<>();
 
@@ -23,11 +23,11 @@ public class SettingCenter {
     }
 
     public static boolean getOnlyWifiLoadImage(){
-        return (boolean)SpHelper.get(LibApp.getContext(), "getOnlyWifiLoadImage", false);
+        return (boolean)SpHelper.sget("getOnlyWifiLoadImage", false);
     }
 
     public static void setOnlyWifiLoadImage(boolean isEnable){
-        SpHelper.get(LibApp.getContext(), "getOnlyWifiLoadImage", isEnable);
+        SpHelper.sput("getOnlyWifiLoadImage", isEnable);
     }
 
     /**
@@ -43,6 +43,14 @@ public class SettingCenter {
     public static Single<Boolean> clearAppCache(){
         return clearFile(LibApp.getContext().getCacheDir());
 
+    }
+
+    public static boolean isAutoDownloadNewApp(){
+        return (boolean)SpHelper.sget("auto_downnewapp", false);
+    }
+
+    public static void setAutoDownloadNewApp(boolean isEnable){
+        SpHelper.sput("auto_downnewapp", isEnable);
     }
 
 }

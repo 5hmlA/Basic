@@ -59,7 +59,7 @@ public class JTitleBar extends RelativeLayout {
         mJtitlebarTitle = (TextView)findViewById(com.blueprint.R.id.jtitlebar_title);
         mJtitlebarLeftButton = (ImageView)findViewById(com.blueprint.R.id.jtitlebar_left_button);
         mJtitlebarRightButton = (ImageView)findViewById(com.blueprint.R.id.jtitlebar_right_button);
-        if(mIsfitsSystemWindows) {
+        if(mIsfitsSystemWindows && Build.VERSION.SDK_INT>=Build.VERSION_CODES.KITKAT) {
             View fitSystem = findViewById(com.blueprint.R.id.jtitlebar_pading_status);
             ViewGroup.LayoutParams layoutParams = fitSystem.getLayoutParams();
             layoutParams.height = getStatusBarHeight();

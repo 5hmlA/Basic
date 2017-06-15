@@ -4,4 +4,6 @@
 
     <string name="jonas_recyc_loading_more">加载更多</string>
     <string name="jonas_recyc_load_retry">点击重试</string>
+    <string name="jdouble_exit">再按一次退出</string>
+    <string name="j_d_newversion">版本更新..</string>
 </resources>

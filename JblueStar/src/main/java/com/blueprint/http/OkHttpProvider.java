@@ -3,7 +3,7 @@ package com.blueprint.http;
 import android.text.TextUtils;
 
 import com.blueprint.LibApp;
-import com.blueprint.SettingCenter;
+import com.blueprint.JSettingCenter;
 import com.blueprint.helper.LogHelper;
 
 import java.io.File;
@@ -144,7 +144,7 @@ public class OkHttpProvider {
             final Request originalRequest = chain.request();
             //对指定URL的请求保存网络数据  保存数据
             String url = originalRequest.url().toString();
-            if(SettingCenter.isNeedSaveData(url)) {
+            if(JSettingCenter.isNeedSaveData(url)) {
                 //save to file
             }
             return chain.proceed(originalRequest);

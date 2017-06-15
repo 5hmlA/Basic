@@ -8,4 +8,6 @@ import com.zuyun.blueprint.vp.basic.JBaseFragment;
  * @date 2017/6/7
  * @des [玩家]
  */
-public class PlayerFrgmt extends JBaseFragment {}
+public class PlayerFrgmt extends JBaseFragment {
+
+}

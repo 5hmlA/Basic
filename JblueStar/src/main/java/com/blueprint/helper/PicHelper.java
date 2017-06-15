@@ -4,7 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.widget.ImageView;
 
-import com.blueprint.SettingCenter;
+import com.blueprint.JSettingCenter;
 import com.blueprint.loadimage.ImgEnginePrivoder;
 import com.blueprint.loadimage.ImgShowConfig;
 import com.squareup.picasso.Picasso;
@@ -15,7 +15,7 @@ public class PicHelper {
 
     public static void loadImage(ImgShowConfig imgShowConfig){
         Context context = imgShowConfig.getImageView().getContext();
-        if(!SettingCenter.getOnlyWifiLoadImage()) {
+        if(!JSettingCenter.getOnlyWifiLoadImage()) {
             loadNormal(context, imgShowConfig);
         }else {
             if(isWifionnected()) {

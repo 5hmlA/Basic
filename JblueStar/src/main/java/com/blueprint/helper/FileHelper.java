@@ -5,6 +5,7 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.blueprint.LibApp;
 import com.blueprint.rx.RxUtill;
 
 import java.io.BufferedReader;
@@ -21,6 +22,8 @@ import io.reactivex.Single;
 import io.reactivex.SingleEmitter;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.annotations.NonNull;
+
+import static com.blueprint.helper.LogHelper.slog_d;
 
 /**
  * Created by _SOLID
@@ -218,9 +221,9 @@ public class FileHelper {
     }
 
 
-    public static void moveRawToDir(Context context, String rawName, String dir){
+    public static void moveRawToDir(String rawName, String dir){
         try {
-            writeFile(context.getAssets().open(rawName), dir, true);
+            writeFile(LibApp.getContext().getAssets().open(rawName), dir, true);
         }catch(Exception e) {
             e.printStackTrace();
             Log.e(TAG, e.getMessage());
@@ -230,21 +233,20 @@ public class FileHelper {
     /**
      * 得到手机的缓存目录
      *
-     * @param context
      * @return
      */
-    public static File getCacheDir(Context context){
-        Log.i("getCacheDir", "cache sdcard state: "+Environment.getExternalStorageState());
+    public static File getCacheDir(){
+        slog_d("getCacheDir", "cache sdcard state: "+Environment.getExternalStorageState());
         if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            File cacheDir = context.getExternalCacheDir();
+            File cacheDir = LibApp.getContext().getExternalCacheDir();
             if(cacheDir != null && ( cacheDir.exists() || cacheDir.mkdirs() )) {
                 Log.i("getCacheDir", "cache dir: "+cacheDir.getAbsolutePath());
                 return cacheDir;
             }
         }
 
-        File cacheDir = context.getCacheDir();
-        Log.i("getCacheDir", "cache dir: "+cacheDir.getAbsolutePath());
+        File cacheDir = LibApp.getContext().getCacheDir();
+        slog_d("getCacheDir", "cache dir: "+cacheDir.getAbsolutePath());
 
         return cacheDir;
     }
@@ -252,11 +254,10 @@ public class FileHelper {
     /**
      * 得到皮肤目录
      *
-     * @param context
      * @return
      */
-    public static File getSkinDir(Context context){
-        File skinDir = new File(getCacheDir(context), "skin");
+    public static File getSkinDir(){
+        File skinDir = new File(getCacheDir(), "skin");
         if(skinDir.exists()) {
             skinDir.mkdirs();
         }
@@ -264,12 +265,12 @@ public class FileHelper {
     }
 
     public static String getSkinDirPath(Context context){
-        return getSkinDir(context).getAbsolutePath();
+        return getSkinDir().getAbsolutePath();
     }
 
-    public static String getSaveImagePath(Context context){
+    public static String getSaveImagePath(){
 
-        String path = getCacheDir(context).getAbsolutePath();
+        String path = getCacheDir().getAbsolutePath();
         if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             path = Environment.getExternalStorageDirectory()
                     .getAbsolutePath()+File.separator+Environment.DIRECTORY_DCIM;
@@ -409,6 +410,11 @@ public class FileHelper {
         File newFile = new File(file.getParent()+File.separator+newName);
         // 如果重命名的文件已存在返回false
         return !newFile.exists() && file.renameTo(newFile);
+    }
+
+    public static String getDownloadPath(){
+        return Environment
+                .getExternalStorageDirectory()+File.separator+Environment.DIRECTORY_DOWNLOADS;
     }
 
     //todo  移动复制
