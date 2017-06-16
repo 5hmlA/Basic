@@ -262,7 +262,7 @@ public class LoadMoreWrapperAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             View child = ( (ViewGroup)viewHolder.itemView ).getChildAt(0);
             if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
                 viewHolder.itemView.setTag(child.getElevation());
-                child.setElevation(6);
+                ViewCompat.setElevation(child,6);
             }
         }
     }
@@ -277,7 +277,7 @@ public class LoadMoreWrapperAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         if(viewHolder.itemView.getTag() != null) {
             View child = ( (ViewGroup)viewHolder.itemView ).getChildAt(0);
             if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
-                child.setElevation(( (Float)viewHolder.itemView.getTag() ));
+                ViewCompat.setElevation(child,( (Float)viewHolder.itemView.getTag() ));
             }
         }
     }

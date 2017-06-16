@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
     <paths>
-        <!--<root-path-->
-            <!--name="root"-->
-            <!--path="" />-->
-        <!--<files-path-->
-            <!--name="files"-->
-            <!--path="" />-->
+        <root-path
+            name="root"
+            path=""/>
+        <files-path
+            name="files"
+            path=""/>
+        <!--内置包名下cache目录-->
+        <cache-path
+            name="cache"
+            path=""/>
 
-        <!--<cache-path-->
-            <!--name="cache"-->
-            <!--path="" />-->
-
-        <!--<external-path-->
-            <!--name="external"-->
-            <!--path="" />-->
-        <!--<external-path-->
-            <!--name="download"-->
-            <!--path="." />-->
-
-        <!--<external-files-path-->
-            <!--name="."-->
-            <!--path="" />-->
-        <!--<external-cache-path-->
-            <!--name="external_cache_path"-->
-            <!--path="" />-->
-        <external-path path="" name="download"/>
+        <!--外置存储卡根目录-->
+        <external-path
+            name="external"
+            path=""/>
+        <!--外置包名下files目录 注意有s是files-->
+        <external-files-path
+            name="external_files_share"
+            path=""/>
+        <!--外置包名下cache目录-->
+        <external-cache-path
+            name="external_cache_share"
+            path=""/>
+        <!--name 代表指定的目录 别名-->
+        <!--path 指定标签目录下哪个具体目录-->
     </paths>
 </resources>

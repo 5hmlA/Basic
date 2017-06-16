@@ -3,6 +3,7 @@ package com.blueprint.adapter;
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
@@ -141,7 +142,7 @@ public abstract class BaseRecvAdapter<T> extends RecyclerView.Adapter<RecyclerHo
         if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
             View child = ((ViewGroup) viewHolder.itemView).getChildAt(0);
             viewHolder.itemView.setTag(child.getElevation());
-            child.setElevation(6);
+            ViewCompat.setElevation(child,6);
         }
     }
 
@@ -149,6 +150,6 @@ public abstract class BaseRecvAdapter<T> extends RecyclerView.Adapter<RecyclerHo
     @Override
     public void clearView(RecyclerView.ViewHolder viewHolder) {
         View child = ((ViewGroup) viewHolder.itemView).getChildAt(0);
-        child.setElevation(((Float) viewHolder.itemView.getTag()));
+        ViewCompat.setElevation(child,((Float) viewHolder.itemView.getTag()));
     }
 }
