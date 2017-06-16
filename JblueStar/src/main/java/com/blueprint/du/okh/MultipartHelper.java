@@ -60,16 +60,11 @@ public class MultipartHelper {
     }
 
     public void download(){
-        //        Request request = new Request.Builder().url(mDownloadUrl).build();
-        //        Call call = getProgressClient(new DownloadProgressInterceptor(mProgressListener)).newCall(request);
-        //
-        //        Single.just(call).subscribeOn(Schedulers.io()).observeOn(Schedulers.io()).subscribe();
         mSubscribe = getRetrofit(new DownloadProgressInterceptor(mProgressListener)).create(MultipartService.class)
                 .download(mDownloadUrl).compose(RxUtill.<ResponseBody>all_io_single()).doOnDispose(new Action() {
                     @Override
                     public void run() throws Exception{
                         mProgressListener.onCancel();
-                        System.out.println("--------------断开了");
                     }
                 }).subscribe(new Consumer<ResponseBody>() {
                     @Override
