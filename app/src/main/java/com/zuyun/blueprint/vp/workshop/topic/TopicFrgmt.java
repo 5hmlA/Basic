@@ -2,20 +2,22 @@ package com.zuyun.blueprint.vp.workshop.topic;
 
 
 import android.app.DownloadManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.ContentObserver;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.blueprint.du.okh.DownLoadEntity;
@@ -23,12 +25,14 @@ import com.blueprint.du.okh.MultipartHelper;
 import com.blueprint.du.okh.ProgressListener;
 import com.blueprint.du.sys.DownloadManagerPro;
 import com.blueprint.service.JUpdateService;
+import com.jakewharton.rxbinding2.view.RxView;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.zuyun.blueprint.R;
-import com.zuyun.blueprint.vp.basic.JBaseFragment;
+import com.zuyun.blueprint.vp.basic.JBaseTitleFrgmt;
 
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.content.Context.DOWNLOAD_SERVICE;
@@ -38,7 +42,7 @@ import static android.content.Context.DOWNLOAD_SERVICE;
  * @date 2017/6/7
  * @des [专题]
  */
-public class TopicFrgmt extends JBaseFragment {
+public class TopicFrgmt extends JBaseTitleFrgmt {
 
     private DownloadManager mSysDownload;
     private long mDownloadId;
@@ -47,6 +51,7 @@ public class TopicFrgmt extends JBaseFragment {
     //    private static final String apktesturl = "https://qd.myapp.com/myapp/qqteam/AndroidQQ/mobileqq_android.apk";
     private DownloadChangeObserver mObserver;
     private MultipartHelper mDownloadHelper;
+    private JUpdateService.DownloadBinder mDownloadBinder;
 
     class DownloadChangeObserver extends ContentObserver {
         public DownloadChangeObserver(Handler handler){
@@ -70,42 +75,51 @@ public class TopicFrgmt extends JBaseFragment {
 
         mSysDownload = (DownloadManager)getActivity().getSystemService(DOWNLOAD_SERVICE);
         mObserver = new DownloadChangeObserver(null);
+        getContext().bindService(new Intent(getContext(), JUpdateService.class), downloadConnection,
+                Context.BIND_AUTO_CREATE);
     }
 
     private boolean pause = true;
 
-    @Nullable
+
     @Override
-    public View onCreateView(LayoutInflater inflater,
-                             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
-        View inflate = inflater.inflate(R.layout.jmain_fm_content, null);
-        TextView mTempTv = (TextView)inflate.findViewById(R.id.temp_tv);
-        mTempTv.setText("2323232");
-        mTempTv.setOnClickListener(new View.OnClickListener() {
+    protected void onCreateContent(LayoutInflater inflater, RelativeLayout container){
+        View rootview = inflater.inflate(R.layout.sec_work_topic, container);
+        mMultiStateLayout.showStateSucceed();
+        RxView.clicks(rootview.findViewById(R.id.btn_start)).subscribe(new Consumer<Object>() {
             @Override
-            public void onClick(View v){
-                if(pause) {
-                    pause = false;
-                    checkPermission();
-                }else {
-                    pause = true;
-                    //                    mDownloadHelper.cancel();
-                }
+            public void accept(@io.reactivex.annotations.NonNull Object o) throws Exception{
+                checkPermission();
             }
         });
-        return inflate;
+        RxView.clicks(rootview.findViewById(R.id.btn_pause)).subscribe(new Consumer<Object>() {
+            @Override
+            public void accept(@io.reactivex.annotations.NonNull Object o) throws Exception{
+                mDownloadBinder.pauseDownload(mDownloadId);
+            }
+        });
+        RxView.clicks(rootview.findViewById(R.id.btn_resume)).subscribe(new Consumer<Object>() {
+            @Override
+            public void accept(@io.reactivex.annotations.NonNull Object o) throws Exception{
+                mDownloadBinder.resumeDownload(mDownloadId);
+            }
+        });
     }
+
 
     @Override
     public void onResume(){
         super.onResume();
-        getContext().getContentResolver().registerContentObserver(Uri.parse("content://downloads/my_downloads"), true, mObserver);
+        getContext().getContentResolver()
+                .registerContentObserver(Uri.parse("content://downloads/my_downloads"), true, mObserver);
     }
 
     @Override
     public void onDestroy(){
         super.onDestroy();
         getContext().getContentResolver().unregisterContentObserver(mObserver);
+
+        getContext().unbindService(downloadConnection);
     }
 
     private void checkPermission(){
@@ -142,60 +156,51 @@ public class TopicFrgmt extends JBaseFragment {
         }
     }
 
-    private long byw;
-
     private void doDownload2(){
-        mDownloadHelper = new MultipartHelper(new DownLoadEntity(apktesturl, "aa"+".apk"),
-                new ProgressListener() {
-                    @Override
-                    public void onProgress(long bytesWritten, long contentLength, boolean done){
-                        System.out.println(bytesWritten*1f/contentLength+"---------+++++++++++++++++++++"+contentLength);
-                        byw = bytesWritten;
-                    }
+        mDownloadHelper = new MultipartHelper(new DownLoadEntity(apktesturl, "aa"+".apk"), new ProgressListener() {
+            @Override
+            public void onProgress(long bytesWritten, long contentLength, boolean done){
+                System.out.println(bytesWritten*1f/contentLength+"---------+++++++++++++++++++++"+contentLength);
+            }
 
-                    @Override
-                    public void onComplete(){
+            @Override
+            public void onComplete(){
 
-                    }
+            }
 
-                    @Override
-                    public void onFailure(){
+            @Override
+            public void onFailure(){
 
-                    }
+            }
 
-                    @Override
-                    public void onCancel(){
+            @Override
+            public void onCancel(){
 
-                    }
-                });
+            }
+        });
         mDownloadHelper.download();
         //        mDownloadHelper.downloadFrom(byw);
     }
 
     private void doDownload(){
-        Intent intent = new Intent(getContext(), JUpdateService.class);
-        intent.putExtra(JUpdateService.UPDATEURL, apktesturl);
-        getContext().startService(intent);
-//        BuildConfig.APPLICATION_ID
-//        downloadFile(apktesturl, "MeiLiShuo.apk");
+
+        //        BuildConfig.APPLICATION_ID
+        //        downloadFile(apktesturl, "MeiLiShuo.apk");
         //        downloadFile("http://down.mumayi.com/41052/mbaidu", "baidu.apk");
-
-
+        mDownloadId = mDownloadBinder.startDownload(apktesturl);
     }
 
-    private void downloadFile(String url, String name){
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-        request.setDescription("通知下载测试");
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, name);
-        request.setTitle("下载");
-        //表示下载进行中和下载完成的通知栏是否显示。默认只显示下载中通知。VISIBILITY_VISIBLE_NOTIFY_COMPLETED表示下载完成后显示通知栏提示
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        /**设置下载文件的类型*/
-        request.setMimeType("application/vnd.android.package-archive");
-        //表示允许MediaScanner扫描到这个文件，默认不允许。
-        //        request.allowScanningByMediaScanner();
-        //表示下载允许的网络类型，默认在任何网络下都允许下载
-        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI);
-        mDownloadId = mSysDownload.enqueue(request);
-    }
+    private ServiceConnection downloadConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service){
+            mDownloadBinder = (JUpdateService.DownloadBinder)service;
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name){
+
+        }
+    };
+
 }

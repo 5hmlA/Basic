@@ -77,7 +77,7 @@ public class DownloadManagerPro {
     public long downloadApp(String url, String saveName, String title, boolean onlyWify){
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
         request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, saveName);
-//        request.setDestinationInExternalPublicDir(FileHelper.getCacheDir().getAbsolutePath(), saveName);
+        //        request.setDestinationInExternalPublicDir(FileHelper.getCacheDir().getAbsolutePath(), saveName);
         request.setTitle(title);
         //表示下载进行中和下载完成的通知栏是否显示。默认只显示下载中通知。VISIBILITY_VISIBLE_NOTIFY_COMPLETED表示下载完成后显示通知栏提示
         //request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
@@ -207,6 +207,10 @@ public class DownloadManagerPro {
      */
     public int[] getBytesAndStatus(long downloadId){
         return getBytesAndStatus(getDownQueryById(downloadId));
+    }
+
+    public int removeDownload(long... ids){
+        return mDownloadManager.remove(ids);
     }
 
     /**
