@@ -6,10 +6,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 
 import com.blueprint.LibApp;
+import com.blueprint.helper.FileHelper;
 
+import java.io.File;
 import java.lang.reflect.Method;
 
 /**
@@ -39,6 +40,13 @@ import java.lang.reflect.Method;
  * @author <a href="http://www.trinea.cn" target="_blank">Trinea</a> 2013-5-4
  */
 public class DownloadManagerPro {
+    //测试可用
+    public final static String URL = "http://dldir1.qq.com/weixin/android/weixin6330android920.apk";
+    public final static String URL1 = "https://qd.myapp.com/myapp/qqteam/AndroidQQ/mobileqq_android.apk";
+    public final static String URL2 = "http://s1.music.126.net/download/android/CloudMusic_official_3.7.3_153912.apk";
+    public final static String URL3 = "http://dl.coolapkmarket.com/down/apk_file/2017/0301/com.ss.android.article.news-6.0.2-602-0301.apk";
+    public final static String URL4 = "http://downali.game.uc.cn/s/1/9/20170103112151d02a45_MY-1.110.0_uc_platform2.apk";
+
 
     public static final Uri CONTENT_URI = Uri.parse("content://downloads/my_downloads");
     /** represents downloaded file above api 11 **/
@@ -76,8 +84,11 @@ public class DownloadManagerPro {
 
     public long downloadApp(String url, String saveName, String title, boolean onlyWify){
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, saveName);
-        //        request.setDestinationInExternalPublicDir(FileHelper.getCacheDir().getAbsolutePath(), saveName);
+
+        //将文件下载到自己的Download文件夹下,必须是External的
+        //这是DownloadManager的限制
+        File file = FileHelper.getFileDownloadPath_file(saveName);
+        request.setDestinationUri(Uri.fromFile(file));
         request.setTitle(title);
         //表示下载进行中和下载完成的通知栏是否显示。默认只显示下载中通知。VISIBILITY_VISIBLE_NOTIFY_COMPLETED表示下载完成后显示通知栏提示
         //request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);

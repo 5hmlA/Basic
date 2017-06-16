@@ -412,11 +412,24 @@ public class FileHelper {
         return !newFile.exists() && file.renameTo(newFile);
     }
 
-    public static String getDownloadPath(){
-        return Environment
-                .getExternalStorageDirectory()+File.separator+Environment.DIRECTORY_DOWNLOADS;
+    //Android/data/包名/file/download/filename
+    public static String getFileDownloadPath(String fileName){
+        return new File(LibApp.getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),fileName).getAbsolutePath();
+    }
+    //Android/data/包名/file/download/filename
+    public static File getFileDownloadPath_file(String fileName){
+        return new File(LibApp.getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),fileName);
     }
 
+    @NonNull
+    public static String getNewAppName(String new_version){
+        return LibApp.getPackageName()+new_version+".apk";
+    }
+
+    @NonNull
+    public static File getNewAppFile(String new_version){
+        return getFileDownloadPath_file(getNewAppName(new_version));
+    }
     //todo  移动复制
 
 }

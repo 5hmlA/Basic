@@ -10,7 +10,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.util.LongSparseArray;
@@ -18,13 +17,17 @@ import android.util.LongSparseArray;
 import com.blueprint.LibApp;
 import com.blueprint.R;
 import com.blueprint.du.sys.DownloadManagerPro;
-import com.blueprint.helper.FileHelper;
-import com.blueprint.helper.PackageHelper;
 import com.blueprint.helper.SpHelper;
 
-import java.io.File;
-
+import static com.blueprint.helper.FileHelper.doClearFile;
+import static com.blueprint.helper.FileHelper.getFileDownloadPath_file;
+import static com.blueprint.helper.FileHelper.getFileDownloadPath;
+import static com.blueprint.helper.FileHelper.getNewAppFile;
+import static com.blueprint.helper.FileHelper.getNewAppName;
 import static com.blueprint.helper.LogHelper.Log_d;
+import static com.blueprint.helper.PackageHelper.getAppVersionCode;
+import static com.blueprint.helper.PackageHelper.installNormal;
+import static java.lang.String.valueOf;
 
 /**
  * @another 江祖赟
@@ -33,15 +36,16 @@ import static com.blueprint.helper.LogHelper.Log_d;
 public class JUpdateService extends Service {
 
     public static final String SP_DOWNLOADID = "up_download_id";
+    public static final int HAVE_NEWAPP = -11;
     private DownloadBinder mDownloadBinder = new DownloadBinder();
     /**
      * 只在 wifi下下载
      */
-    private boolean mDownload_wifi_only;
+    private boolean mDownload_wifi_only = true;
     /**
      * 只下载 不安装
      */
-    private boolean mDownload_only;
+    private boolean mDownload_only = true;
     private String mNewversion = "1.0";
     private BroadcastReceiver mDownloadSuccessReceiver;
     private DownloadManagerPro mDownloadManagerPro;
@@ -56,18 +60,28 @@ public class JUpdateService extends Service {
             return this;
         }
 
+
         /**
          * 下载
+         * -11表示本地存在新版本
          *
          * @param apkUrl
          *         下载的url
          */
-        public long startDownload(String apkUrl){
-            long downloadId = 0;
+        public long check2download_install(String apkUrl){
+            long downloadId = -10;
             //点击下载
             //原有app版本和当前版本一致 删除原有的APK
-            if(FileHelper.fileExists(getSPathFileName())) {
+            doClearFile(getFileDownloadPath_file(getNewAppName(valueOf(getAppVersionCode()))));
 
+            //判断文件是否存在
+            if(getFileDownloadPath_file(getNewAppName(mNewversion)).exists()) {
+                Log_d("更新的文件 ****** 文件已经存在");
+                if(!mDownload_only) {
+                    autoInstallNewApp();
+                }
+                destroySelf();
+                return HAVE_NEWAPP;
             }
             if(ActivityCompat.checkSelfPermission(getApplicationContext(),
                     Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
@@ -124,37 +138,20 @@ public class JUpdateService extends Service {
     private void autoInstallNewApp(){
         Log_d("安装app ****** ");
         //是否需要自动安装/只下载
-        PackageHelper.installNormal(getSPathFileName());
+        installNormal(getNewAppFile(mNewversion));
     }
 
     private long doDownload(String downloadUrl){
         long downloadid = 0;
-        //判断文件是否存在
-        if(!FileHelper.fileExists(getSPathFileName())) {
-            Log_d("开始下载apk ****** ");
-            downloadid = mDownloadManagerPro
-                    .downloadApp(downloadUrl, getSaveName(), LibApp.findString(R.string.j_d_newversion),
-                            mDownload_wifi_only);
-            SpHelper.sput(SP_DOWNLOADID, downloadid);
-            mApkPaths.append(downloadid, getSPathFileName());
-        }else {
-            Log_d("更新的文件 ****** 文件已经存在");
-            if(!mDownload_only) {
-                autoInstallNewApp();
-            }
-            destroySelf();
-        }
+
+        Log_d("开始下载apk ****** ");
+        downloadid = mDownloadManagerPro
+                .downloadApp(downloadUrl, getNewAppName(mNewversion), LibApp.findString(R.string.j_d_newversion),
+                        mDownload_wifi_only);
+        SpHelper.sput(SP_DOWNLOADID, downloadid);
+        mApkPaths.append(downloadid, getFileDownloadPath(getNewAppName(mNewversion)));
+
         return downloadid;
-    }
-
-    @NonNull
-    private String getSPathFileName(){
-        return FileHelper.getDownloadPath()+File.separator+getSaveName();
-    }
-
-    @NonNull
-    private String getSaveName(){
-        return LibApp.getPackageName()+mNewversion+".apk";
     }
 
     public class DownloadSuccessReceiver extends BroadcastReceiver {
@@ -163,7 +160,7 @@ public class JUpdateService extends Service {
             // get complete download id
             long completeDownloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
             SpHelper.sremove(SP_DOWNLOADID);
-            Log_d("更新下载完成 ****** "+completeDownloadId+" 下载地址："+mApkPaths.get(completeDownloadId));
+            Log_d("更新下载完成 ****** "+completeDownloadId+" 存储地址："+mApkPaths.get(completeDownloadId));
             if(!mDownload_only) {
                 autoInstallNewApp();
             }
@@ -180,7 +177,6 @@ public class JUpdateService extends Service {
     @Override
     public void onDestroy(){
         super.onDestroy();
-
         unregisterReceiver(mDownloadSuccessReceiver);
     }
 }

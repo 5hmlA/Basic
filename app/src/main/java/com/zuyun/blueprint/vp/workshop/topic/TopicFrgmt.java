@@ -20,10 +20,13 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.blueprint.LibApp;
 import com.blueprint.du.okh.DownLoadEntity;
 import com.blueprint.du.okh.MultipartHelper;
 import com.blueprint.du.okh.ProgressListener;
 import com.blueprint.du.sys.DownloadManagerPro;
+import com.blueprint.helper.FileHelper;
+import com.blueprint.helper.PackageHelper;
 import com.blueprint.service.JUpdateService;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.tbruyelle.rxpermissions2.RxPermissions;
@@ -179,7 +182,6 @@ public class TopicFrgmt extends JBaseTitleFrgmt {
             }
         });
         mDownloadHelper.download();
-        //        mDownloadHelper.downloadFrom(byw);
     }
 
     private void doDownload(){
@@ -187,7 +189,11 @@ public class TopicFrgmt extends JBaseTitleFrgmt {
         //        BuildConfig.APPLICATION_ID
         //        downloadFile(apktesturl, "MeiLiShuo.apk");
         //        downloadFile("http://down.mumayi.com/41052/mbaidu", "baidu.apk");
-        mDownloadId = mDownloadBinder.startDownload(apktesturl);
+//        mDownloadId = mDownloadBinder.startDownload(apktesturl);
+        PackageHelper.installNormal(FileHelper.getFileDownloadPath_file(LibApp.getPackageName()+"1.0.apk"));
+//        mDownloadBinder.startDownload(JUpdateService.URL);
+//        mDownloadBinder.startDownload(JUpdateService.URL1);
+//        mDownloadBinder.startDownload(JUpdateService.URL2);
     }
 
     private ServiceConnection downloadConnection = new ServiceConnection() {
