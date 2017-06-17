@@ -17,23 +17,17 @@ import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Single;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -42,18 +36,20 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * @another 江祖赟
  * @date 2017/6/14.
  */
-public class MultipartHelper {
+public class MultipartHelper2 {
     private static final String TAG = "MultipartHelper2";
     private static final long DEFAULT_TIMEOUT = 15;
+    private String mDownloadUrl;
+    private String mSaveName;
     private DownloadCell mDownloadCell;
     private ProgressListener mProgressListener;
     private long mStartsPoint;
     private final File mDestFile;
     private Disposable mSubscribe;
-    private final ExecutorService mDownloadThreadPools;
-    private ThreadLocal<DownloadCell> mThreadLocal = new ThreadLocal<>();
 
-    public MultipartHelper(DownloadCell downloadCell, ProgressListener progressListener){
+    public MultipartHelper2(DownloadCell downloadCell, ProgressListener progressListener){
+        mDownloadUrl = downloadCell.getDownUrl();
+        mSaveName = downloadCell.getSaveName();
         mDownloadCell = downloadCell;
         mDestFile = mDownloadCell.getDestFile();
         if(mDestFile.exists()) {
@@ -61,7 +57,6 @@ public class MultipartHelper {
             mDestFile.delete();
         }
         mProgressListener = progressListener;
-        mDownloadThreadPools = Executors.newFixedThreadPool(4);
     }
 
     private OkHttpClient getProgressClient(Interceptor interceptor){
@@ -70,43 +65,35 @@ public class MultipartHelper {
                 .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS).build();
     }
 
-    public void download(final DownloadCell downloadCell){
-        downloadCell.setDownloadState(DownloadCell.DownloadStates.D_STATE_WAIGHT);
-        mDownloadThreadPools.execute(new Runnable() {
-            @Override
-            public void run(){
-                mThreadLocal.set(downloadCell);
-
-            }
-        });
-        Call call = getProgressClient(new DownloadProgressInterceptor(mProgressListener))
-                .newCall(new Request.Builder().url(mDownloadCell.getDownUrl()).build());
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e){
-                mProgressListener.onFailure();
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException{
-                save(response.body(), mStartsPoint);
-            }
-        });
+    public void download(){
+        mSubscribe = getRetrofit(new DownloadProgressInterceptor(mProgressListener)).create(MultipartService.class)
+                .download(mDownloadUrl).compose(RxUtill.<ResponseBody>all_io_single())
+                .subscribe(new Consumer<ResponseBody>() {
+                    @Override
+                    public void accept(@NonNull ResponseBody responseBody) throws Exception{
+                        save(responseBody, mStartsPoint);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(@NonNull Throwable throwable) throws Exception{
+                        mProgressListener.onFailure();
+                    }
+                });
     }
 
     public void downloadFrom(long startPoing){
         mStartsPoint = startPoing;
-        getProgressClient(new DownloadProgressInterceptor(mProgressListener)).newCall(
-                new Request.Builder().url(mDownloadCell.getDownUrl()).header("RANGE", "bytes="+startPoing+"-").build())
-                .enqueue(new Callback() {
+        mSubscribe = getRetrofit(new DownloadProgressInterceptor(mProgressListener)).create(MultipartService.class)
+                .downloadRange(mDownloadUrl, String.valueOf(startPoing)).compose(RxUtill.<ResponseBody>all_io_single())
+                .subscribe(new Consumer<ResponseBody>() {
                     @Override
-                    public void onFailure(Call call, IOException e){
-                        mProgressListener.onFailure();
+                    public void accept(@NonNull ResponseBody responseBody) throws Exception{
+                        save(responseBody, mStartsPoint);
                     }
-
+                }, new Consumer<Throwable>() {
                     @Override
-                    public void onResponse(Call call, Response response) throws IOException{
-                        save(response.body(), mStartsPoint);
+                    public void accept(@NonNull Throwable throwable) throws Exception{
+                        mProgressListener.onFailure();
                     }
                 });
     }
@@ -137,6 +124,7 @@ public class MultipartHelper {
             int len;
             while(( len = in.read(buffer) ) != -1) {
                 mappedBuffer.put(buffer, 0, len);
+                System.out.println("________________");
             }
         }catch(IOException e) {
             e.printStackTrace();

@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION"/>
     <uses-permission android:name="android.permission.INSTALL_PACKAGES"
                      tools:ignore="ProtectedPermissions"/>
 
@@ -13,7 +14,7 @@
         android:supportsRtl="true"
         >
 
-        <service android:name=".service.JUpdateService"/>
+        <service android:name=".service.JDownloadService"/>
 
         <provider
             android:name="android.support.v4.content.FileProvider"

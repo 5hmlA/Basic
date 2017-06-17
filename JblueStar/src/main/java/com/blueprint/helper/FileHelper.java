@@ -414,11 +414,18 @@ public class FileHelper {
 
     //Android/data/包名/file/download/filename
     public static String getFileDownloadPath(String fileName){
-        return new File(LibApp.getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),fileName).getAbsolutePath();
+        return new File(LibApp.getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileName)
+                .getAbsolutePath();
     }
+
+    //Android/data/包名/file/download/filename
+    public static String getFileDownloadPath(String dir, String fileName){
+        return new File(LibApp.getContext().getExternalFilesDir(dir), fileName).getAbsolutePath();
+    }
+
     //Android/data/包名/file/download/filename
     public static File getFileDownloadPath_file(String fileName){
-        return new File(LibApp.getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),fileName);
+        return new File(LibApp.getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileName);
     }
 
     @NonNull
@@ -430,6 +437,7 @@ public class FileHelper {
     public static File getNewAppFile(String new_version){
         return getFileDownloadPath_file(getNewAppName(new_version));
     }
+
     //todo  移动复制
 
 }

@@ -8,20 +8,32 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.text.TextUtils;
 import android.util.LongSparseArray;
 
 import com.blueprint.LibApp;
 import com.blueprint.R;
+import com.blueprint.du.DownloadCell;
 import com.blueprint.du.sys.DownloadManagerPro;
+import com.blueprint.error.ErrorMsg;
 import com.blueprint.helper.SpHelper;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+
+import static com.blueprint.error.ErrorMsg.DEFAULTERROR;
 import static com.blueprint.helper.FileHelper.doClearFile;
-import static com.blueprint.helper.FileHelper.getFileDownloadPath_file;
 import static com.blueprint.helper.FileHelper.getFileDownloadPath;
+import static com.blueprint.helper.FileHelper.getFileDownloadPath_file;
 import static com.blueprint.helper.FileHelper.getNewAppFile;
 import static com.blueprint.helper.FileHelper.getNewAppName;
 import static com.blueprint.helper.LogHelper.Log_d;
@@ -33,7 +45,7 @@ import static java.lang.String.valueOf;
  * @another 江祖赟
  * @date 2017/6/15.
  */
-public class JUpdateService extends Service {
+public class JDownloadService extends Service {
 
     public static final String SP_DOWNLOADID = "up_download_id";
     public static final int HAVE_NEWAPP = -11;
@@ -46,18 +58,59 @@ public class JUpdateService extends Service {
      * 只下载 不安装
      */
     private boolean mDownload_only = true;
-    private String mNewversion = "1.0";
+    private ObservableEmitter<DownloadCell> mDownloadEmitter;
+    private String mNewversion = "";
     private BroadcastReceiver mDownloadSuccessReceiver;
     private DownloadManagerPro mDownloadManagerPro;
     private LongSparseArray<String> mApkPaths = new LongSparseArray<>();
+    private int mNotifyVisibility = DEFAULTERROR;
+    private DownloadCell mDownloadCell;
 
     public class DownloadBinder extends Binder {
+
 
         public DownloadBinder config(boolean downloadwify_only, boolean download_only, String new_version){
             mDownload_wifi_only = downloadwify_only;
             mDownload_only = download_only;
             mNewversion = new_version;
             return this;
+        }
+
+        public DownloadBinder config(String new_version){
+            mNewversion = new_version;
+            return this;
+        }
+
+        public DownloadBinder config(boolean download_only){
+            mDownload_only = download_only;
+            return this;
+        }
+
+        /**
+         * @param notifyVisibility
+         * @return
+         */
+        public DownloadBinder configNotify(int notifyVisibility){
+            mNotifyVisibility = notifyVisibility;
+            return this;
+        }
+
+        /**
+         * @return
+         */
+        public Observable getDownloadObserver(DownloadCell downloadCell){
+            mDownloadCell = downloadCell;
+            return Observable.create(new ObservableOnSubscribe<DownloadCell>() {
+                @Override
+                public void subscribe(@NonNull ObservableEmitter<DownloadCell> downloadEmitter) throws Exception{
+                    mDownloadEmitter = downloadEmitter;
+                }
+            }).doOnSubscribe(new Consumer<Disposable>() {
+                @Override
+                public void accept(@NonNull Disposable disposable) throws Exception{
+                    startDownload(mDownloadCell.getDownUrl());
+                }
+            });
         }
 
 
@@ -96,15 +149,21 @@ public class JUpdateService extends Service {
         }
 
         public void pauseDownload(long downloadId){
-            mDownloadManagerPro.pauseDownload(downloadId);
+            if(mDownloadManagerPro != null) {
+                mDownloadManagerPro.pauseDownload(downloadId);
+            }
         }
 
         public void resumeDownload(long downloadId){
-            mDownloadManagerPro.resumeDownload(downloadId);
+            if(mDownloadManagerPro != null) {
+                mDownloadManagerPro.resumeDownload(downloadId);
+            }
         }
 
         public void cancelDownload(long downloadId){
-            mDownloadManagerPro.removeDownload(downloadId);
+            if(mDownloadManagerPro != null) {
+                mDownloadManagerPro.removeDownload(downloadId);
+            }
         }
 
         /**
@@ -115,7 +174,23 @@ public class JUpdateService extends Service {
          * @return 进度信息 max-100
          */
         public float getProgress(long downloadId){
-            return mDownloadManagerPro.getDownloadProgress(downloadId);
+            if(mDownloadManagerPro != null) {
+                return mDownloadManagerPro.getDownloadProgress(downloadId);
+            }
+            return 0;
+        }
+
+    }
+
+    private void startDownload(String downUrl){
+        if(String.valueOf(ErrorMsg.DEFAULTERROR).equals(mDownloadCell.getDownloadID())) {
+            //使用ok
+        }else {
+            //使用系统默认
+            DownloadManager.Request downloadRequest = new DownloadManager.Request(Uri.parse(downUrl));
+            if(!TextUtils.isEmpty(mDownloadCell.getExtra1())) {
+                downloadRequest.setNotificationVisibility(Integer.parseInt(mDownloadCell.getExtra1()));
+            }
         }
 
     }
@@ -147,9 +222,12 @@ public class JUpdateService extends Service {
         Log_d("开始下载apk ****** ");
         downloadid = mDownloadManagerPro
                 .downloadApp(downloadUrl, getNewAppName(mNewversion), LibApp.findString(R.string.j_d_newversion),
-                        mDownload_wifi_only);
+                        mDownload_wifi_only, mNotifyVisibility);
         SpHelper.sput(SP_DOWNLOADID, downloadid);
+        mDownloadCell.setDownloadID(String.valueOf(downloadid));
         mApkPaths.append(downloadid, getFileDownloadPath(getNewAppName(mNewversion)));
+        mDownloadCell.setSavePath(getFileDownloadPath(getNewAppName(mNewversion)));
+        mDownloadCell.setSaveName(getNewAppName(mNewversion));
 
         return downloadid;
     }
@@ -161,6 +239,10 @@ public class JUpdateService extends Service {
             long completeDownloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
             SpHelper.sremove(SP_DOWNLOADID);
             Log_d("更新下载完成 ****** "+completeDownloadId+" 存储地址："+mApkPaths.get(completeDownloadId));
+
+            if(mDownloadEmitter != null) {
+                mDownloadEmitter.onComplete();
+            }
             if(!mDownload_only) {
                 autoInstallNewApp();
             }

@@ -20,11 +20,11 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.blueprint.du.okh.DownLoadEntity;
-import com.blueprint.du.okh.MultipartHelper;
+import com.blueprint.du.DownloadCell;
+import com.blueprint.du.okh.MultipartHelper2;
 import com.blueprint.du.okh.ProgressListener;
 import com.blueprint.du.sys.DownloadManagerPro;
-import com.blueprint.service.JUpdateService;
+import com.blueprint.service.JDownloadService;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.zuyun.blueprint.R;
@@ -50,8 +50,8 @@ public class TopicFrgmt extends JBaseTitleFrgmt {
     private static final String apktesturl = "http://cdn.llsapp.com/android/LLS-v4.0-595-20160908-143200.apk";
     //    private static final String apktesturl = "https://qd.myapp.com/myapp/qqteam/AndroidQQ/mobileqq_android.apk";
     private DownloadChangeObserver mObserver;
-    private MultipartHelper mDownloadHelper;
-    private JUpdateService.DownloadBinder mDownloadBinder;
+    private MultipartHelper2 mDownloadHelper;
+    private JDownloadService.DownloadBinder mDownloadBinder;
 
     class DownloadChangeObserver extends ContentObserver {
         public DownloadChangeObserver(Handler handler){
@@ -75,7 +75,7 @@ public class TopicFrgmt extends JBaseTitleFrgmt {
 
         mSysDownload = (DownloadManager)getActivity().getSystemService(DOWNLOAD_SERVICE);
         mObserver = new DownloadChangeObserver(null);
-        getContext().bindService(new Intent(getContext(), JUpdateService.class), downloadConnection,
+        getContext().bindService(new Intent(getContext(), JDownloadService.class), downloadConnection,
                 Context.BIND_AUTO_CREATE);
     }
 
@@ -96,6 +96,9 @@ public class TopicFrgmt extends JBaseTitleFrgmt {
             @Override
             public void accept(@io.reactivex.annotations.NonNull Object o) throws Exception{
                 mDownloadBinder.pauseDownload(mDownloadId);
+                if(mDownloadHelper != null) {
+                    mDownloadHelper.pause();
+                }
             }
         });
         RxView.clicks(rootview.findViewById(R.id.btn_resume)).subscribe(new Consumer<Object>() {
@@ -151,51 +154,51 @@ public class TopicFrgmt extends JBaseTitleFrgmt {
             });
         }else {
 
-            doDownload();
-            //            doDownload2();
+            //            doDownload();
+            doDownload2();
         }
     }
 
     private void doDownload2(){
-        mDownloadHelper = new MultipartHelper(new DownLoadEntity(apktesturl, "aa"+".apk"), new ProgressListener() {
-            @Override
-            public void onProgress(long bytesWritten, long contentLength, boolean done){
-                System.out.println(bytesWritten*1f/contentLength+"---------+++++++++++++++++++++"+contentLength);
-            }
+        mDownloadHelper = new MultipartHelper2(
+                new DownloadCell.DownloadCellBuilder().downUrl(apktesturl).saveName("aa"+""+".apk").build(),
+                new ProgressListener() {
+                    @Override
+                    public void onProgress(long bytesWritten, long contentLength, boolean done){
+                        System.out
+                                .println(bytesWritten*1f/contentLength+"---------+++++++++++++++++++++"+contentLength);
+                    }
 
-            @Override
-            public void onComplete(){
+                    @Override
+                    public void onComplete(){
 
-            }
+                    }
 
-            @Override
-            public void onFailure(){
+                    @Override
+                    public void onFailure(){
 
-            }
+                    }
 
-            @Override
-            public void onCancel(){
+                    @Override
+                    public void onCancel(){
 
-            }
-        });
+                    }
+                });
         mDownloadHelper.download();
     }
 
     private void doDownload(){
 
-        //        BuildConfig.APPLICATION_ID
-        //        downloadFile(apktesturl, "MeiLiShuo.apk");
-        //        downloadFile("http://down.mumayi.com/41052/mbaidu", "baidu.apk");
-        mDownloadId = mDownloadBinder.check2download_install(apktesturl);
-//        mDownloadBinder.startDownload(JUpdateService.URL);
-//        mDownloadBinder.startDownload(JUpdateService.URL1);
-//        mDownloadBinder.startDownload(JUpdateService.URL2);
+        mDownloadId = mDownloadBinder.config(false).check2download_install(apktesturl);
+        System.out.println(DownloadManagerPro.URL.hashCode());
+        System.out.println(DownloadManagerPro.URL1.hashCode());
+        System.out.println(DownloadManagerPro.URL2.hashCode());
     }
 
     private ServiceConnection downloadConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service){
-            mDownloadBinder = (JUpdateService.DownloadBinder)service;
+            mDownloadBinder = (JDownloadService.DownloadBinder)service;
 
         }
 

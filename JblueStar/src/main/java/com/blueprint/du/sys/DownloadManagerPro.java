@@ -13,6 +13,8 @@ import com.blueprint.helper.FileHelper;
 import java.io.File;
 import java.lang.reflect.Method;
 
+import static com.blueprint.error.ErrorMsg.DEFAULTERROR;
+
 /**
  * DownloadManagerPro
  * <ul>
@@ -82,7 +84,7 @@ public class DownloadManagerPro {
         return mDownloadManager.enqueue(request);
     }
 
-    public long downloadApp(String url, String saveName, String title, boolean onlyWify){
+    public long downloadApp(String url, String saveName, String title, boolean onlyWify, int notifyconfig){
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
 
         //将文件下载到自己的Download文件夹下,必须是External的
@@ -90,8 +92,18 @@ public class DownloadManagerPro {
         File file = FileHelper.getFileDownloadPath_file(saveName);
         request.setDestinationUri(Uri.fromFile(file));
         request.setTitle(title);
+        if(notifyconfig != DEFAULTERROR)
         //表示下载进行中和下载完成的通知栏是否显示。默认只显示下载中通知。VISIBILITY_VISIBLE_NOTIFY_COMPLETED表示下载完成后显示通知栏提示
         //request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        //        Request.VISIBILITY_VISIBLE：在下载进行的过程中，通知栏中会一直显示该下载的Notification，当下载完成时，该Notification会被移除，这是默认的参数值。
+        //        Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED：在下载过程中通知栏会一直显示该下载的Notification，在下载完成后该Notification会继续显示，直到用户点击该
+        //        Notification或者消除该Notification。
+        //        Request.VISIBILITY_VISIBLE_NOTIFY_ONLY_COMPLETION：只有在下载完成后该Notification才会被显示。
+        //        Request.VISIBILITY_HIDDEN：不显示该下载请求的Notification。如果要使用这个参数，需要在应用的清单文件中加上DOWNLOAD_WITHOUT_NOTIFICATION权限。
+        {
+            request.setNotificationVisibility(notifyconfig);
+        }
+
         /**设置下载文件的类型*/
         request.setMimeType("application/vnd.android.package-archive");
         //表示允许MediaScanner扫描到这个文件，默认不允许。
@@ -346,92 +358,6 @@ public class DownloadManagerPro {
      */
     public int getReason(long downloadId){
         return getInt(downloadId, DownloadManager.COLUMN_REASON);
-    }
-
-
-    public static class RequestPro extends Request {
-
-        public static final String METHOD_NAME_SET_NOTI_CLASS = "setNotiClass";
-        public static final String METHOD_NAME_SET_NOTI_EXTRAS = "setNotiExtras";
-
-        private static boolean isInitNotiClass = false;
-        private static boolean isInitNotiExtras = false;
-
-        private static Method setNotiClass = null;
-        private static Method setNotiExtras = null;
-
-        /**
-         * @param uri
-         *         the HTTP URI to download.
-         */
-        public RequestPro(Uri uri){
-            super(uri);
-        }
-
-        /**
-         * set noti class, only init once
-         *
-         * @param className
-         *         full class name
-         */
-        public void setNotiClass(String className){
-            synchronized(this) {
-
-                if(!isInitNotiClass) {
-                    isInitNotiClass = true;
-                    try {
-                        setNotiClass = Request.class.getMethod(METHOD_NAME_SET_NOTI_CLASS, CharSequence.class);
-                    }catch(Exception e) {
-                        // accept all exception
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            if(setNotiClass != null) {
-                try {
-                    setNotiClass.invoke(this, className);
-                }catch(Exception e) {
-                    /**
-                     * accept all exception, include ClassNotFoundException, NoSuchMethodException,
-                     * InvocationTargetException, NullPointException
-                     */
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        /**
-         * set noti extras, only init once
-         *
-         * @param extras
-         */
-        public void setNotiExtras(String extras){
-            synchronized(this) {
-
-                if(!isInitNotiExtras) {
-                    isInitNotiExtras = true;
-                    try {
-                        setNotiExtras = Request.class.getMethod(METHOD_NAME_SET_NOTI_EXTRAS, CharSequence.class);
-                    }catch(Exception e) {
-                        // accept all exception
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            if(setNotiExtras != null) {
-                try {
-                    setNotiExtras.invoke(this, extras);
-                }catch(Exception e) {
-                    /**
-                     * accept all exception, include ClassNotFoundException, NoSuchMethodException,
-                     * InvocationTargetException, NullPointException
-                     */
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 
     /**
