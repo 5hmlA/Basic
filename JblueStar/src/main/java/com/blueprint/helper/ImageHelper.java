@@ -12,6 +12,8 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.Map;
 
+import static com.blueprint.helper.FileHelper.closeQuietly;
+
 /**
  * ImageHelper
  * <ul>
@@ -160,7 +162,7 @@ public class ImageHelper {
             Map<String, String> requestProperties) {
         InputStream stream = getInputStreamFromUrl(imageUrl, readTimeOutMillis, requestProperties);
         Drawable d = Drawable.createFromStream(stream, "src");
-        IOUtils.close(stream);
+        closeQuietly(stream);
         return d;
     }
 
@@ -185,7 +187,7 @@ public class ImageHelper {
     public static Bitmap getBitmapFromUrl(String imageUrl, int readTimeOut, Map<String, String> requestProperties) {
         InputStream stream = getInputStreamFromUrl(imageUrl, readTimeOut, requestProperties);
         Bitmap b = BitmapFactory.decodeStream(stream);
-        IOUtils.close(stream);
+        closeQuietly(stream);
         return b;
     }
 

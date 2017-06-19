@@ -10,6 +10,7 @@ import com.blueprint.rx.RxUtill;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -35,6 +36,17 @@ public class FileHelper {
     private static String TAG = "FileUtils";
     private static String FILE_WRITING_ENCODING = "UTF-8";
     private static String FILE_READING_ENCODING = "UTF-8";
+
+    public static void closeQuietly(Closeable closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (RuntimeException rethrown) {
+                throw rethrown;
+            } catch (Exception ignored) {
+            }
+        }
+    }
 
     public static String readFile(String _sFileName, String _sEncoding) throws Exception{
         StringBuffer buffContent = null;
@@ -69,16 +81,8 @@ public class FileHelper {
             throw new Exception("读取文件时错误!", ex);
         }finally {
             // 增加异常时资源的释放
-            try {
-                if(buffReader != null) {
-                    buffReader.close();
-                }
-                if(fis != null) {
-                    fis.close();
-                }
-            }catch(Exception ex) {
-                ex.printStackTrace();
-            }
+            closeQuietly(buffReader);
+            closeQuietly(fis);
         }
     }
 
@@ -125,16 +129,8 @@ public class FileHelper {
             e.printStackTrace();
             throw new Exception("写文件错误", e);
         }finally {
-            try {
-                if(os != null) {
-                    os.close();
-                }
-                if(is != null) {
-                    is.close();
-                }
-            }catch(Exception e) {
-                e.printStackTrace();
-            }
+            closeQuietly(os);
+            closeQuietly(is);
         }
     }
 

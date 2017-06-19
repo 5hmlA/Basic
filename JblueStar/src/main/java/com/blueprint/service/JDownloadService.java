@@ -68,7 +68,6 @@ public class JDownloadService extends Service {
 
     public class DownloadBinder extends Binder {
 
-
         public DownloadBinder config(boolean downloadwify_only, boolean download_only, String new_version){
             mDownload_wifi_only = downloadwify_only;
             mDownload_only = download_only;
@@ -180,17 +179,32 @@ public class JDownloadService extends Service {
             return 0;
         }
 
+
+        public JDownloadService getService(){
+            return JDownloadService.this;
+        }
+
     }
 
-    private void startDownload(String downUrl){
+    public void startDownload(String downUrl){
         if(String.valueOf(ErrorMsg.DEFAULTERROR).equals(mDownloadCell.getDownloadID())) {
             //使用ok
+
+
         }else {
             //使用系统默认
             DownloadManager.Request downloadRequest = new DownloadManager.Request(Uri.parse(downUrl));
+            //通知栏设置 是否显示
             if(!TextUtils.isEmpty(mDownloadCell.getExtra1())) {
                 downloadRequest.setNotificationVisibility(Integer.parseInt(mDownloadCell.getExtra1()));
             }
+
+            downloadRequest.setDestinationUri(Uri.fromFile(mDownloadCell.getDestFile()));
+            //是否只在WiFi环境下下载
+            if(!TextUtils.isEmpty(mDownloadCell.getExtra2())) {
+                downloadRequest.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI);
+            }
+            mDownloadManagerPro.startDownload(downloadRequest);
         }
 
     }

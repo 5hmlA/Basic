@@ -53,7 +53,9 @@ public class OkHttpProvider {
         httpClientBuilder.cache(new Cache(httpCacheDirectory, 100*1024*30));
         //设置拦截器
         httpClientBuilder.addInterceptor(new UserAgentInterceptor("Android Device"));
-        httpClientBuilder.addInterceptor(new LoggingInterceptor());
+        if(LibApp.isInDebug()) {
+            httpClientBuilder.addInterceptor(new LoggingInterceptor());
+        }
 
         //        注意：addInterceptor和addNetworkInterceptor 需要同时设置。
         // 如果 只是想实现在线缓存，那么可以只添加网络拦截器，如果只想实现离线缓存，可以使用只添加应用拦截器。

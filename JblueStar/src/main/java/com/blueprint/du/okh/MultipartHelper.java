@@ -6,7 +6,6 @@ import com.blueprint.LibApp;
 import com.blueprint.du.DownloadCell;
 import com.blueprint.helper.LogHelper;
 import com.blueprint.rx.RxUtill;
-import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +20,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Single;
+import io.reactivex.Flowable;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
@@ -36,7 +35,10 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+
+import static com.blueprint.helper.FileHelper.closeQuietly;
 
 /**
  * @another 江祖赟
@@ -141,31 +143,23 @@ public class MultipartHelper {
         }catch(IOException e) {
             e.printStackTrace();
         }finally {
-            try {
-                in.close();
-                if(channelOut != null) {
-                    channelOut.close();
-                }
-                if(randomAccessFile != null) {
-                    randomAccessFile.close();
-                }
-            }catch(IOException e) {
-                e.printStackTrace();
-            }
+            closeQuietly(in);
+            closeQuietly(channelOut);
+            closeQuietly(randomAccessFile);
         }
     }
 
-    public Single getUplodFileSingle(String upUrl, File file){
+    public Flowable getUplodFileSingle(String upUrl, File file){
         if(file != null && file.exists()) {
             RequestBody requestFile = RequestBody.create(MediaType.parse("application/otcet-stream"), file);
 
             MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
             return getRetrofit(new UploadProgressInterceptor(mProgressListener)).create(MultipartService.class)
-                    .upload(upUrl, body).compose(RxUtill.all_io_single());
+                    .upload(upUrl, body).compose(RxUtill.all_io_flow());
 
         }
 
-        return Single.error(new RuntimeException("文件不存在"));
+        return Flowable.error(new RuntimeException("文件不存在"));
     }
 
     public void uploadFiles(String upUrl, File file){
@@ -197,7 +191,7 @@ public class MultipartHelper {
             files.put("file"+i+"\"; filename=\""+file.getName(),
                     RequestBody.create(MediaType.parse("application/otcet-stream"), file));
         }
-        multipartService.upload(ulr, files).compose(RxUtill.defaultSchedulers_single()).subscribe(new Consumer() {
+        multipartService.upload(ulr, files).compose(RxUtill.defaultSchedulers_flow()).subscribe(new Consumer() {
             @Override
             public void accept(@NonNull Object o) throws Exception{
 

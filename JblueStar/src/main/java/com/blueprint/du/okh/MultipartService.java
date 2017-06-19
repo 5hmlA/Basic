@@ -2,7 +2,7 @@ package com.blueprint.du.okh;
 
 import java.util.Map;
 
-import io.reactivex.Single;
+import io.reactivex.Flowable;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -26,19 +26,20 @@ public interface MultipartService {
 //    Ui/Image/uploadUnlimited.html
     @GET
     @Streaming
-    Single<ResponseBody> download(@Url String url);
+    Flowable<ResponseBody> download(@Url String url);
+//    Flowable<Response<ResponseBody>> download(@Url String url);
 //非断点    http://cdn.llsapp.com/android/LLS-v4.0-595-20160908-143200.apk
 
     @Streaming
     @GET
-    Single<ResponseBody> downloadRange(@Url String fileUrl, @Header("Range") String range);
+    Flowable<ResponseBody> downloadRange(@Url String fileUrl, @Header("Range") String range);
 //断电测试    https://qd.myapp.com/myapp/qqteam/AndroidQQ/mobileqq_android.apk
 
     @Multipart
     @POST
-    Single upload(@Url String url, @PartMap Map<String,RequestBody> files);
+    Flowable upload(@Url String url, @PartMap Map<String,RequestBody> files);
 
     @Multipart
     @POST
-    Single upload(@Url String url, @Part MultipartBody.Part files);
+    Flowable upload(@Url String url, @Part MultipartBody.Part files);
 }

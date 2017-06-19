@@ -19,6 +19,7 @@ import io.reactivex.schedulers.Schedulers;
  * @des [一句话描述]
  */
 public class RxUtill {
+
     public static <T> FlowableTransformer<T, T> defaultSchedulers_flow() {
         return new FlowableTransformer<T, T>() {
             @Override

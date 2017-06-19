@@ -43,6 +43,8 @@ public class LoopImagePager extends RelativeLayout {
     private boolean mMove;
     private PointF mLastMoved = new PointF();
     private int mCurrentPosition = 20;
+    private ViewPager.PageTransformer mMzTransformer = new MzTransformer();
+    ;
 
     public LoopImagePager(Context context){
         this(context, null);
@@ -61,7 +63,6 @@ public class LoopImagePager extends RelativeLayout {
         layoutParams.leftMargin = (int)DpHelper.dp2px(20);
         layoutParams.rightMargin = (int)DpHelper.dp2px(20);
         mViewPager.setLayoutParams(layoutParams);
-        mViewPager.setPageTransformer(true, new MzTransformer());
         addView(mViewPager);
 
         //        indicatorView = new IndicatorView(mContext);
@@ -121,6 +122,23 @@ public class LoopImagePager extends RelativeLayout {
     }
 
     public LoopImagePager setPagerData(List<String> pagerData){
+        setPagerData(pagerData, true);
+        return this;
+    }
+
+    public LoopImagePager setPagerData(List<String> pagerData, ViewPager.PageTransformer transformer){
+        mMzTransformer = transformer;
+        setPagerData(pagerData, transformer != null);
+        return this;
+    }
+
+    private LoopImagePager setPagerData(List<String> pagerData, boolean needTransformer){
+        if(mMzTransformer != null && needTransformer
+
+
+                ) {
+            mViewPager.setPageTransformer(true, mMzTransformer);
+        }
         mAdapter = new ImagePagerAdapter(pagerData);
         mViewPager.setAdapter(mAdapter);
         mCurrentPosition = pagerData.size()>1 ? mCurrentPosition : 0;

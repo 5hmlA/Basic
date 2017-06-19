@@ -33,6 +33,8 @@ public class DownloadCell {
     private String saveName;
     private String downloadID;
     private long fileSize;
+    private long downloaded;
+    private long startPoint;
     /**
      * 设置通知栏样式
      */
@@ -71,16 +73,18 @@ public class DownloadCell {
         return mDownloadState;
     }
 
-    public void setDownloadState(int downloadState){
+    public DownloadCell setDownloadState(int downloadState){
         mDownloadState = downloadState;
+        return this;
     }
 
     public String getDownUrl(){
         return downUrl;
     }
 
-    public void setDownUrl(String downUrl){
+    public DownloadCell setDownUrl(String downUrl){
         this.downUrl = downUrl;
+        return this;
     }
 
     public String getSavePath(){
@@ -91,72 +95,99 @@ public class DownloadCell {
         return new File(savePath, saveName);
     }
 
-    public void setSavePath(String savePath){
+    public long getStartPoint(){
+        return startPoint;
+    }
+
+    public DownloadCell setStartPoint(long startPoint){
+        this.startPoint = startPoint;
+        return this;
+    }
+
+    public DownloadCell setSavePath(String savePath){
         this.savePath = savePath;
+        return this;
     }
 
     public String getSaveName(){
         return saveName;
     }
 
-    public void setSaveName(String saveName){
+    public DownloadCell setSaveName(String saveName){
         this.saveName = saveName;
+        return this;
+    }
+
+    public long getDownloaded(){
+        return downloaded;
+    }
+
+    public DownloadCell setDownloaded(long downloaded){
+        this.downloaded = downloaded;
+        return this;
     }
 
     public String getDownloadID(){
         return downloadID;
     }
 
-    public void setDownloadID(String downloadID){
+    public DownloadCell setDownloadID(String downloadID){
         this.downloadID = downloadID;
+        return this;
     }
 
     public long getFileSize(){
         return fileSize;
     }
 
-    public void setFileSize(long fileSize){
+    public DownloadCell setFileSize(long fileSize){
         this.fileSize = fileSize;
+        return this;
     }
 
     public String getExtra1(){
         return extra1;
     }
 
-    public void setExtra1(String extra1){
+    public DownloadCell setExtra1(String extra1){
         this.extra1 = extra1;
+        return this;
     }
 
     public String getExtra2(){
         return extra2;
     }
 
-    public void setExtra2(String extra2){
+    public DownloadCell setExtra2(String extra2){
         this.extra2 = extra2;
+        return this;
     }
 
     public String getExtra3(){
         return extra3;
     }
 
-    public void setExtra3(String extra3){
+    public DownloadCell setExtra3(String extra3){
         this.extra3 = extra3;
+        return this;
     }
 
     public String getVersion(){
         return version;
     }
 
-    public void setVersion(String version){
+    public DownloadCell setVersion(String version){
         this.version = version;
+        return this;
     }
 
     public Pair getPair(){
         return mPair;
     }
 
-    public void setPair(Pair pair){
+    public DownloadCell setPair(Pair pair){
         mPair = pair;
+        return this;
     }
 
     public static class DownloadCellBuilder {
