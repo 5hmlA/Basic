@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/colorAccent" android:state_pressed="true"/>
+    <!--5.0 以下找不到-->
+    <!--<item android:state_pressed="true" android:color="?attr/colorControlHighlight"/>-->
+    <item android:drawable="@android:color/white"/>
+</selector>

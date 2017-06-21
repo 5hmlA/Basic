@@ -19,4 +19,8 @@
         <item name="android:backgroundDimEnabled">true</item>
     </style>
 
+    <style name="po" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorAccent">@color/accent_material_dark_1</item>
+    </style>
+
 </resources>

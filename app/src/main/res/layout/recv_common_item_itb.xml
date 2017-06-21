@@ -4,6 +4,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:animateLayoutChanges="true"
+                android:background="@drawable/selector_jbackground"
+                android:clickable="true"
                 android:layoutAnimation="@anim/layaniscalecenter"
                 android:gravity="center_vertical">
 

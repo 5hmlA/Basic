@@ -16,6 +16,11 @@
 
     <color name="text_black_87">#de000000</color>
     <color name="text_white_87">#deFFFFFF</color>
+    <color name="accent_material_light_1">#f50000</color>
+    <color name="accent_material_light_2">#f50000</color>
+    <color name="foreground_material_light_1">#c20606</color>
+    <color name="accent_material_light_3">#f500b8</color>
+    <color name="accent_material_dark_1">#ff4040</color>
 
     <array name="note_neutral_colors">
         <item>#9E9E9E</item>
