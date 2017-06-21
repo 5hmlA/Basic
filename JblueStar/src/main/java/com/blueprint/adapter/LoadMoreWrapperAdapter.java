@@ -301,7 +301,6 @@ public class LoadMoreWrapperAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     public void onViewAttachedToWindow(RecyclerView.ViewHolder holder){
         super.onViewAttachedToWindow(holder);
         ItemViewBinder binderByIndex = mInnerAdapter.getBinderByIndex(holder.getItemViewType());
-        System.out.println(holder.getAdapterPosition()+"---onViewAttachedToWindow----"+binderByIndex);
     }
 
     @Override
@@ -313,8 +312,5 @@ public class LoadMoreWrapperAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     @Override
     public void onViewDetachedFromWindow(RecyclerView.ViewHolder holder){
         super.onViewDetachedFromWindow(holder);
-
-        ItemViewBinder binderByIndex = mInnerAdapter.getBinderByIndex(holder.getItemViewType());
-        System.out.println(holder.getAdapterPosition()+"---onViewAttachedToWindow----"+binderByIndex);
     }
 }

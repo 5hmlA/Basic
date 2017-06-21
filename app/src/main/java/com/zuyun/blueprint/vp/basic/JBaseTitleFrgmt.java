@@ -122,15 +122,9 @@ public abstract class JBaseTitleFrgmt extends JBaseFragment {
 
     @Override
     public void firstUserVisibile(){
-        //todo 去掉测试的延时效果
-        mMultiStateLayout.postDelayed(new Runnable() {
-            @Override
-            public void run(){
-                if(mBasePresenter != null) {
-                    mBasePresenter.subscribe();
-                }
-            }
-        }, 1500);
+        if(mBasePresenter != null) {
+            mBasePresenter.subscribe();
+        }
     }
 
     @Override

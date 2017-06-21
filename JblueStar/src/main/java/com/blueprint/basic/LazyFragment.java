@@ -14,7 +14,7 @@ public abstract class LazyFragment extends Fragment {
 
     private boolean mIsViewCreated;
     private boolean mIsVisibleToUser;
-    private boolean mIsFirstVisibile = false;
+    private boolean mIsFirstVisibile = true;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState){

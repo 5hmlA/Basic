@@ -52,8 +52,9 @@ dependencies {
     compile thirdLibs.rxandroid
 
     compile thirdLibs.jtabstrip
-    compile 'com.yun.ospl:multitstatelayout:1.6.2@aar'
-    compile('me.drakeet.multitype:multitype:2.5.0-beta', {
+    //compile thirdLibs.jstatelayout
+    compile 'com.yun.ospl:multitstatelayout:1.6.3-beta@aar'
+    compile('me.drakeet.multitype:multitype:2.5.0', {
         exclude group: 'com.android.support'
     })
     compile "com.squareup.retrofit2:converter-gson:$libsVersion.retrofit2"

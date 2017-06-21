@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.zuyun.blueprint.Constants;
+import com.zuyun.blueprint.R;
 import com.zuyun.blueprint.vp.basic.JBaseTitleFrgmt;
 import com.zuyun.blueprint.vp.workshop.recommend.itemholderbinder.ItemChangeMoudleBinder;
 import com.zuyun.blueprint.vp.workshop.recommend.itemholderbinder.ItemLoopImageBinder;
@@ -17,7 +18,6 @@ import com.zuyun.blueprint.vp.workshop.recommend.itemholderbinder.ItemRecomWormB
 import com.zuyun.blueprint.vp.workshop.recommend.itemholderbinder.bean.ItemChangeMoudle;
 import com.zuyun.blueprint.vp.workshop.recommend.itemholderbinder.bean.ItemLoopImage;
 import com.zuyun.blueprint.vp.workshop.recommend.itemholderbinder.bean.ItemRecomWorm;
-import com.zuyun.blueprint.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +46,12 @@ public class RecomFrgmt extends JBaseTitleFrgmt implements RecomContract.IRecomV
     @Override
     protected boolean requestNoTitleBar(){
         return true;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState){
+        super.onActivityCreated(savedInstanceState);
+
     }
 
     @Override
@@ -115,8 +121,7 @@ public class RecomFrgmt extends JBaseTitleFrgmt implements RecomContract.IRecomV
     }
 
     @Override
-    public boolean getUserVisibleHint(){
-        return super.getUserVisibleHint();
+    public void firstUserVisibile(){
+        super.firstUserVisibile();
     }
-
 }
