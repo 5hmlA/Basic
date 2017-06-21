@@ -2,13 +2,15 @@ package com.blueprint.http;
 
 import android.text.TextUtils;
 
-import com.blueprint.LibApp;
 import com.blueprint.JSettingCenter;
+import com.blueprint.LibApp;
 import com.blueprint.helper.LogHelper;
-import com.facebook.stetho.okhttp3.StethoInterceptor;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -28,6 +30,9 @@ public class OkHttpProvider {
     private final static long DEFAULT_WRITE_TIMEOUT = 20;
     private final static long DEFAULT_READ_TIMEOUT = 10;
     private static final String OKHTTPCACHE = "OkHttpCache";
+    private static List<Interceptor> sInterceptors = new ArrayList<>();
+    private static List<Interceptor> sNetInterceptors = new ArrayList<>();
+
 
     public static OkHttpClient getDefaultOkHttpClient(){
         return getOkHttpClient(new CacheControlInterceptor());
@@ -54,17 +59,30 @@ public class OkHttpProvider {
         httpClientBuilder.cache(new Cache(httpCacheDirectory, 100*1024*30));
         //设置拦截器
         httpClientBuilder.addInterceptor(new UserAgentInterceptor("Android Device"));
-        if(LibApp.isInDebug()) {
-            httpClientBuilder.addNetworkInterceptor(new StethoInterceptor()).addInterceptor(new LoggingInterceptor());
-        }
 
         //        注意：addInterceptor和addNetworkInterceptor 需要同时设置。
         // 如果 只是想实现在线缓存，那么可以只添加网络拦截器，如果只想实现离线缓存，可以使用只添加应用拦截器。
         httpClientBuilder.addInterceptor(cacheControl);
         httpClientBuilder.addNetworkInterceptor(cacheControl);
 
+        for(Interceptor netInterceptor : sNetInterceptors) {
+            httpClientBuilder.addNetworkInterceptor(netInterceptor);
+        }
+        for(Interceptor netInterceptor : sInterceptors) {
+            httpClientBuilder.addInterceptor(netInterceptor);
+        }
         httpClientBuilder.addNetworkInterceptor(new NetDataSaveInterceptor());
         return httpClientBuilder.build();
+    }
+
+    public static void fixedInterceptors(Interceptor... interceptors){
+        sInterceptors.clear();
+        sInterceptors.addAll(Arrays.asList(interceptors));
+    }
+
+    public static void fixedNetInterceptors(Interceptor... interceptors){
+        sNetInterceptors.clear();
+        sNetInterceptors.addAll(Arrays.asList(interceptors));
     }
 
     /**
