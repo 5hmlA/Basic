@@ -1,4 +1,4 @@
-package com.blueprint.widget;
+package com.blueprint.basic;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,7 +14,7 @@ public abstract class LazyFragment extends Fragment {
 
     private boolean mIsViewCreated;
     private boolean mIsVisibleToUser;
-    private boolean mIsFirstVisibile = true;
+    private boolean mIsFirstVisibile = false;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState){

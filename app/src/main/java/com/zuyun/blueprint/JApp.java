@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 import com.blueprint.LibApp;
+import com.facebook.stetho.Stetho;
 import com.squareup.leakcanary.LeakCanary;
 
 public class JApp extends Application implements Application.ActivityLifecycleCallbacks {
@@ -21,7 +22,7 @@ public class JApp extends Application implements Application.ActivityLifecycleCa
         LeakCanary.install(this);
 
         registerActivityLifecycleCallbacks(this);
-
+        Stetho.initializeWithDefaults(this);
 
     }
 

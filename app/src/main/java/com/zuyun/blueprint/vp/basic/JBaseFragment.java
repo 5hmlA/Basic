@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.blueprint.helper.LogHelper;
-import com.blueprint.widget.LazyFragment;
+import com.blueprint.basic.LazyFragment;
 import com.zuyun.blueprint.R;
 
 /**

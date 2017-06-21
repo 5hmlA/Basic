@@ -44,7 +44,6 @@ public class LoopImagePager extends RelativeLayout {
     private PointF mLastMoved = new PointF();
     private int mCurrentPosition = 20;
     private ViewPager.PageTransformer mMzTransformer = new MzTransformer();
-    ;
 
     public LoopImagePager(Context context){
         this(context, null);
@@ -116,36 +115,29 @@ public class LoopImagePager extends RelativeLayout {
         }
     }
 
-    public LoopImagePager setPagerAdapter(PagerAdapter pagerAdapter){
-        mViewPager.setAdapter(pagerAdapter);
+    public LoopImagePager setPagerAdapter(ImagePagerAdapter pagerAdapter){
+        mAdapter = pagerAdapter;
         return this;
     }
 
     public LoopImagePager setPagerData(List<String> pagerData){
-        setPagerData(pagerData, true);
-        return this;
-    }
-
-    public LoopImagePager setPagerData(List<String> pagerData, ViewPager.PageTransformer transformer){
-        mMzTransformer = transformer;
-        setPagerData(pagerData, transformer != null);
-        return this;
-    }
-
-    private LoopImagePager setPagerData(List<String> pagerData, boolean needTransformer){
-        if(mMzTransformer != null && needTransformer
-
-
-                ) {
+        if(mMzTransformer != null) {
             mViewPager.setPageTransformer(true, mMzTransformer);
         }
-        mAdapter = new ImagePagerAdapter(pagerData);
+        if(mAdapter == null) {
+            mAdapter = new ImagePagerAdapter(pagerData);
+        }
         mViewPager.setAdapter(mAdapter);
         mCurrentPosition = pagerData.size()>1 ? mCurrentPosition : 0;
         mViewPager.setCurrentItem(mCurrentPosition);
         if(mL != null) {
             mAdapter.setOnitemClickListener(mL);
         }
+        return this;
+    }
+
+    public LoopImagePager setPageTransformer(ViewPager.PageTransformer transformer){
+        mMzTransformer = transformer;
         return this;
     }
 

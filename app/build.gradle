@@ -15,6 +15,19 @@ android {
 
         buildConfigField "String", "APP_BASE_URL", "\"http://gank.io/api/data/\""
     }
+//    我们知道当方法书超过64k时，需要配置multidex，但是如果我们的工程minSdkVersion 设置为 20 或更低值，
+// 那么构建时间会大大增加，因为构建系统必须就哪些类必须包括在主 DEX 文件中以及哪些类可以包括在辅助 DEX 文件中作出复杂的决策。
+//    productFlavors {
+//        dev {
+//            // Enable pre-dexing to produce an APK that can be tested on
+//            // Android 5.0+ without the time-consuming DEX build processes.
+//            minSdkVersion 21
+//        }
+//        prod {
+//            // The actual minSdkVersion for the production version.
+//            minSdkVersion config.minSdkVersion
+//        }
+//    }
     buildTypes {
         release {
             minifyEnabled false
@@ -42,7 +55,8 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.6.0'
 
     compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4@aar'
-
+    compile 'com.facebook.stetho:stetho:1.5.0'
+    compile 'com.facebook.stetho:stetho-okhttp3:1.5.0'
     compile project(':JblueStar')
 
 }

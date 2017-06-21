@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import com.blueprint.R;
 import com.blueprint.helper.LogHelper;
-import com.blueprint.widget.LazyFragment;
 
 /**
  * @author 江祖赟.

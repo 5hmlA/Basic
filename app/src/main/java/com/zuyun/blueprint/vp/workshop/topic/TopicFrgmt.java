@@ -97,7 +97,7 @@ public class TopicFrgmt extends JBaseTitleFrgmt {
             public void accept(@io.reactivex.annotations.NonNull Object o) throws Exception{
                 mDownloadBinder.pauseDownload(mDownloadId);
                 if(mDownloadHelper != null) {
-                    mDownloadHelper.pause();
+//                    mDownloadHelper.pause();
                 }
             }
         });
@@ -184,7 +184,7 @@ public class TopicFrgmt extends JBaseTitleFrgmt {
 
                     }
                 });
-        mDownloadHelper.download();
+//        mDownloadHelper.download();
     }
 
     private void doDownload(){

@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.blueprint.LibApp;
 import com.blueprint.JSettingCenter;
 import com.blueprint.helper.LogHelper;
+import com.facebook.stetho.okhttp3.StethoInterceptor;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,7 +55,7 @@ public class OkHttpProvider {
         //设置拦截器
         httpClientBuilder.addInterceptor(new UserAgentInterceptor("Android Device"));
         if(LibApp.isInDebug()) {
-            httpClientBuilder.addInterceptor(new LoggingInterceptor());
+            httpClientBuilder.addNetworkInterceptor(new StethoInterceptor()).addInterceptor(new LoggingInterceptor());
         }
 
         //        注意：addInterceptor和addNetworkInterceptor 需要同时设置。
