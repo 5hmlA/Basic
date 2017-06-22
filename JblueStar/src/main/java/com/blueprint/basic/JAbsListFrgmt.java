@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import com.blueprint.R;
+import com.blueprint.adapter.decoration.DividerItemDecoration;
 import com.blueprint.adapter.LoadMoreWrapperAdapter;
 import com.blueprint.adapter.RecyclerHolder;
 
@@ -50,6 +51,7 @@ public abstract class JAbsListFrgmt extends JBaseTitleFrgmt implements SwipeRefr
     private void initRecView(){
         MultiTypeAdapter multiTypeAdapter = new MultiTypeAdapter(mListData);
         mCommonRecv.setLayoutManager(setLayoutManager());
+        mCommonRecv.addItemDecoration(setItemDecoration());
         register2Adapter(multiTypeAdapter);
         mRecvAdapter = new LoadMoreWrapperAdapter(multiTypeAdapter) {
 
@@ -76,6 +78,10 @@ public abstract class JAbsListFrgmt extends JBaseTitleFrgmt implements SwipeRefr
         mRecvAdapter.setPagesize(setPageSize());
         mRecvAdapter.setOnMoreloadListener(this);
         mCommonRecv.setAdapter(mRecvAdapter);
+    }
+
+    private RecyclerView.ItemDecoration setItemDecoration(){
+        return new DividerItemDecoration(1);
     }
 
     public int setPageSize(){
