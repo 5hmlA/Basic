@@ -23,7 +23,7 @@ import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.UUID;
 
-import static com.blueprint.error.ErrorMsg.DEFAULTSTR;
+import static com.blueprint.Consistent.DEFAULTSTR;
 
 public class PhoneHelper {
     private static final String TAG = "PhoneHelper";

@@ -12,9 +12,9 @@ import android.view.View;
  */
 public abstract class LazyFragment extends Fragment {
 
-    private boolean mIsViewCreated;
-    private boolean mIsVisibleToUser;
-    private boolean mIsFirstVisibile = true;
+    protected boolean mIsViewCreated;
+    protected boolean mIsVisibleToUser;
+    protected boolean mIsFirstVisibile = true;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState){

@@ -1,16 +1,18 @@
 package com.blueprint.basic;
 
-import com.blueprint.error.ErrorMsg;
+import com.blueprint.Consistent;
 
 /**
  * @author 江祖赟.
  * @date 2017/6/6
  * @des [一句话描述]
  */
-public interface JBaseView {
+public interface JBaseView<T> {
 
     void showLoading();
 
-    void showError(ErrorMsg emsg);
+    void showError(Consistent.ErrorCode errorCode);
+
+    void showSucceed(T data);
 
 }

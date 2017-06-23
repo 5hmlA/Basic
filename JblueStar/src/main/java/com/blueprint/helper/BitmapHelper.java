@@ -27,17 +27,19 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 
-public class BitmapUtils {
+public class BitmapHelper {
 
-    private static final String TAG = BitmapUtils.class.getSimpleName();
+    private static final String TAG = BitmapHelper.class.getSimpleName();
 
-    public static Bitmap drawable2bitmap(Drawable drawable) {
-        if (drawable instanceof BitmapDrawable) {
-            BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
+    public static Bitmap drawable2bitmap(Drawable drawable){
+        if(drawable instanceof BitmapDrawable) {
+            BitmapDrawable bitmapDrawable = (BitmapDrawable)drawable;
             return bitmapDrawable.getBitmap();
         }
         int w = drawable.getIntrinsicWidth();
         int h = drawable.getIntrinsicHeight();
+        w = w>0 ? w : 1;
+        h = h>0 ? h : 1;
         Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         drawable.draw(canvas);
@@ -47,14 +49,17 @@ public class BitmapUtils {
     /**
      * TODO<图片圆角处理>
      *
-     * @param srcBitmap 源图片的bitmap
-     * @param ret       圆角的度数
+     * @param srcBitmap
+     *         源图片的bitmap
+     * @param ret
+     *         圆角的度数
      * @return Bitmap
+     *
      * @throw
      */
-    public static Bitmap getRoundImage(Bitmap srcBitmap, float ret) {
+    public static Bitmap getRoundImage(Bitmap srcBitmap, float ret){
 
-        if (null == srcBitmap) {
+        if(null == srcBitmap) {
             Log.e(TAG, "the srcBitmap is null");
             return null;
         }
@@ -62,16 +67,14 @@ public class BitmapUtils {
         int bitWidth = srcBitmap.getWidth();
         int bitHight = srcBitmap.getHeight();
 
-        BitmapShader bitmapShader = new BitmapShader(srcBitmap,
-                Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+        BitmapShader bitmapShader = new BitmapShader(srcBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         paint.setShader(bitmapShader);
 
         RectF rectf = new RectF(0, 0, bitWidth, bitHight);
 
-        Bitmap outBitmap = Bitmap.createBitmap(bitWidth, bitHight,
-                Bitmap.Config.ARGB_8888);
+        Bitmap outBitmap = Bitmap.createBitmap(bitWidth, bitHight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(outBitmap);
         canvas.drawRoundRect(rectf, ret, ret, paint);
         canvas.save();
@@ -81,24 +84,23 @@ public class BitmapUtils {
     }
 
 
-    public static Bitmap getRoundImage(Bitmap source) {
+    public static Bitmap getRoundImage(Bitmap source){
 
-        if (null == source) {
+        if(null == source) {
             Log.e(TAG, "the srcBitmap is null");
             return null;
         }
         int size = Math.min(source.getWidth(), source.getHeight());
 
-        int width = (source.getWidth() - size) / 2;
-        int height = (source.getHeight() - size) / 2;
+        int width = ( source.getWidth()-size )/2;
+        int height = ( source.getHeight()-size )/2;
 
         Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
 
         Canvas canvas = new Canvas(bitmap);
         Paint paint = new Paint();
-        BitmapShader shader =
-                new BitmapShader(source, BitmapShader.TileMode.CLAMP, BitmapShader.TileMode.CLAMP);
-        if (width != 0 || height != 0) {
+        BitmapShader shader = new BitmapShader(source, BitmapShader.TileMode.CLAMP, BitmapShader.TileMode.CLAMP);
+        if(width != 0 || height != 0) {
             Matrix matrix = new Matrix();
             matrix.setTranslate(-width, -height);
             shader.setLocalMatrix(matrix);
@@ -106,7 +108,7 @@ public class BitmapUtils {
         paint.setShader(shader);
         paint.setAntiAlias(true);
 
-        float r = size / 2f;
+        float r = size/2f;
         canvas.drawCircle(r, r, r, paint);
 
         source.recycle();
@@ -116,15 +118,19 @@ public class BitmapUtils {
     /**
      * TODO<图片模糊化处理>
      *
-     * @param bitmap  源图片
-     * @param radius  The radius of the blur Supported range 0 < radius <= 25
-     * @param context 上下文
+     * @param bitmap
+     *         源图片
+     * @param radius
+     *         The radius of the blur Supported range 0 < radius <= 25
+     * @param context
+     *         上下文
      * @return Bitmap
+     *
      * @throw
      */
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @SuppressLint("NewApi")
-    public static Bitmap blurBitmap(Bitmap bitmap, float radius, Context context) {
+    public static Bitmap blurBitmap(Bitmap bitmap, float radius, Context context){
 
         //Let's create an empty bitmap with the same size of the bitmap we want to blur
         Bitmap outBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
@@ -140,9 +146,9 @@ public class BitmapUtils {
         Allocation allOut = Allocation.createFromBitmap(rs, outBitmap);
 
         //Set the radius of the blur
-        if (radius > 25) {
+        if(radius>25) {
             radius = 25.0f;
-        } else if (radius <= 0) {
+        }else if(radius<=0) {
             radius = 1.0f;
         }
         blurScript.setRadius(radius);
@@ -169,19 +175,22 @@ public class BitmapUtils {
     /**
      * TODO<给图片添加指定颜色的边框>
      *
-     * @param srcBitmap   原图片
-     * @param borderWidth 边框宽度
-     * @param color       边框的颜色值
+     * @param srcBitmap
+     *         原图片
+     * @param borderWidth
+     *         边框宽度
+     * @param color
+     *         边框的颜色值
      * @return
      */
-    public static Bitmap addFrameBitmap(Bitmap srcBitmap, int borderWidth, int color) {
-        if (srcBitmap == null) {
+    public static Bitmap addFrameBitmap(Bitmap srcBitmap, int borderWidth, int color){
+        if(srcBitmap == null) {
             Log.e(TAG, "the srcBitmap or borderBitmap is null");
             return null;
         }
 
-        int newWidth = srcBitmap.getWidth() + borderWidth;
-        int newHeight = srcBitmap.getHeight() + borderWidth;
+        int newWidth = srcBitmap.getWidth()+borderWidth;
+        int newHeight = srcBitmap.getHeight()+borderWidth;
 
         Bitmap outBitmap = Bitmap.createBitmap(newWidth, newHeight, Bitmap.Config.ARGB_8888);
 
@@ -198,10 +207,10 @@ public class BitmapUtils {
         paint.setStrokeWidth(borderWidth);
         canvas.drawRect(rec, paint);
 
-        canvas.drawBitmap(srcBitmap, borderWidth / 2, borderWidth / 2, null);
+        canvas.drawBitmap(srcBitmap, borderWidth/2, borderWidth/2, null);
         canvas.save(Canvas.ALL_SAVE_FLAG);
         canvas.restore();
-        if (srcBitmap != null && !srcBitmap.isRecycled()) {
+        if(srcBitmap != null && !srcBitmap.isRecycled()) {
             srcBitmap.recycle();
             srcBitmap = null;
         }
@@ -209,13 +218,13 @@ public class BitmapUtils {
         return outBitmap;
     }
 
-    public static boolean saveBitmap(Bitmap bmp, String path) {
+    public static boolean saveBitmap(Bitmap bmp, String path){
         Bitmap.CompressFormat format = Bitmap.CompressFormat.JPEG;
         int quality = 100;
         OutputStream stream = null;
         try {
             stream = new FileOutputStream(path);
-        } catch (FileNotFoundException e) {
+        }catch(FileNotFoundException e) {
             e.printStackTrace();
         }
 
@@ -223,35 +232,35 @@ public class BitmapUtils {
     }
 
     // 把Bitmap 转成 Byte
-    public static byte[] Bitmap2Bytes(Bitmap bm) {
+    public static byte[] Bitmap2Bytes(Bitmap bm){
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bm.compress(Bitmap.CompressFormat.PNG, 100, baos);
         return baos.toByteArray();
     }
 
     // byte[]转换成Bitmap
-    public static Bitmap Bytes2Bitmap(byte[] b) {
-        if (b.length != 0) {
+    public static Bitmap Bytes2Bitmap(byte[] b){
+        if(b.length != 0) {
             return BitmapFactory.decodeByteArray(b, 0, b.length);
         }
         return null;
     }
 
-    public static Bitmap stringtoBitmap(String string) {
+    public static Bitmap stringtoBitmap(String string){
         // 将字符串转换成Bitmap类型
         Bitmap bitmap = null;
         try {
             byte[] bitmapArray;
             bitmapArray = Base64.decode(string, Base64.DEFAULT);
             bitmap = BitmapFactory.decodeByteArray(bitmapArray, 0, bitmapArray.length);
-        } catch (Exception e) {
+        }catch(Exception e) {
             e.printStackTrace();
         }
 
         return bitmap;
     }
 
-    public static String bitmaptoString(Bitmap bitmap) {
+    public static String bitmaptoString(Bitmap bitmap){
         // 将Bitmap转换成字符串
         String string = null;
         ByteArrayOutputStream bStream = new ByteArrayOutputStream();
@@ -262,12 +271,12 @@ public class BitmapUtils {
     }
 
     //图片缩放
-    public static Bitmap scaleDownBitmap(Bitmap photo, int newHeight, Context context) {
+    public static Bitmap scaleDownBitmap(Bitmap photo, int newHeight, Context context){
 
         final float densityMultiplier = context.getResources().getDisplayMetrics().density;
 
-        int h = (int) (newHeight * densityMultiplier);
-        int w = (int) (h * photo.getWidth() / ((double) photo.getHeight()));
+        int h = (int)( newHeight*densityMultiplier );
+        int w = (int)( h*photo.getWidth()/( (double)photo.getHeight() ) );
 
         photo = Bitmap.createScaledBitmap(photo, w, h, true);
 

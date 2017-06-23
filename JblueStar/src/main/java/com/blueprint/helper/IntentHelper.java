@@ -10,7 +10,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 
 import com.blueprint.LibApp;
-import com.blueprint.error.ErrorMsg;
+import com.blueprint.Consistent;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -119,7 +119,7 @@ public class IntentHelper {
             cx.startActivityForResult(takePictureIntent, requestCode);
             return file.getAbsolutePath();
         }
-        return ErrorMsg.DEFAULTSTR;
+        return Consistent.DEFAULTSTR;
     }
 
     /**

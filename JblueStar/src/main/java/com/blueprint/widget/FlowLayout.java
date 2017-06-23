@@ -1,5 +1,6 @@
 package com.blueprint.widget;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -16,7 +17,7 @@ import android.widget.Checkable;
 import android.widget.CheckedTextView;
 import android.widget.TextView;
 
-import com.blueprint.error.ErrorMsg;
+import com.blueprint.Consistent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +66,7 @@ public class FlowLayout extends ViewGroup implements View.OnClickListener {
     private LayoutParams mItemLayoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, dip2px(28));
     private int mTextSize = 13;
     private StateListDrawable mItemBgselector;
-    private int mItemBg_ids = ErrorMsg.DEFAULTERROR;
+    private int mItemBg_ids = Consistent.DEFAULTERROR;
     private int mItemGravity = Gravity.CENTER;
 
     public FlowLayout(Context context){
@@ -77,32 +78,11 @@ public class FlowLayout extends ViewGroup implements View.OnClickListener {
         // TODO Auto-generated constructor stub
     }
 
-    public FlowLayout setHorizontalSpacing(int spacing){
-        if(mHorizontalSpacing != spacing) {
-            mHorizontalSpacing = spacing;
-            requestLayoutInner();
-        }
-        return this;
-    }
-
-    public FlowLayout setVerticalSpacing(int spacing){
-        if(mVerticalSpacing != spacing) {
-            mVerticalSpacing = spacing;
-            requestLayoutInner();
-        }
-        return this;
-    }
-
-    public FlowLayout setMaxLines(int count){
-        if(mMaxLinesCount != count) {
-            mMaxLinesCount = count;
-            requestLayoutInner();
-        }
-        return this;
-    }
-
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     private void requestLayoutInner(){
-        requestLayout();
+        if(isAttachedToWindow()) {
+            requestLayout();
+        }
     }
 
     @Override
@@ -371,11 +351,10 @@ public class FlowLayout extends ViewGroup implements View.OnClickListener {
         }else {
             box.setTextColor(mItemTvColorSelector);
         }
-        //        box.setButtonDrawable(new ColorDrawable(Color.TRANSPARENT));
         box.setLayoutParams(mItemLayoutParams);
         if(mItemBgselector != null) {
             box.setBackground(mItemBgselector);
-        }else if(mItemBg_ids != ErrorMsg.DEFAULTERROR) {
+        }else if(mItemBg_ids != Consistent.DEFAULTERROR) {
             box.setBackgroundResource(mItemBg_ids);
         }
         box.setTextSize(mTextSize);
@@ -469,6 +448,29 @@ public class FlowLayout extends ViewGroup implements View.OnClickListener {
 
     public FlowLayout setItemGravity(int itemGravity){
         mItemGravity = itemGravity;
+        return this;
+    }
+    public FlowLayout setHorizontalSpacing(int spacing){
+        if(mHorizontalSpacing != spacing) {
+            mHorizontalSpacing = spacing;
+            requestLayoutInner();
+        }
+        return this;
+    }
+
+    public FlowLayout setVerticalSpacing(int spacing){
+        if(mVerticalSpacing != spacing) {
+            mVerticalSpacing = spacing;
+            requestLayoutInner();
+        }
+        return this;
+    }
+
+    public FlowLayout setMaxLines(int count){
+        if(mMaxLinesCount != count) {
+            mMaxLinesCount = count;
+            requestLayoutInner();
+        }
         return this;
     }
 }

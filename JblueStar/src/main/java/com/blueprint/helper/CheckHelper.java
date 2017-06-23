@@ -2,7 +2,7 @@ package com.blueprint.helper;
 
 import java.util.Collection;
 
-import static com.blueprint.error.ErrorMsg.DEFAULTSTR;
+import static com.blueprint.Consistent.DEFAULTSTR;
 
 public class CheckHelper {
 

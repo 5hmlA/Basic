@@ -36,11 +36,20 @@ public abstract class JAbsListFrgmt extends JBaseTitleFrgmt implements SwipeRefr
 
     @Override
     protected void onCreateContent(LayoutInflater inflater, RelativeLayout container){
-        View rootView = inflater.inflate(R.layout.jcommon_abslist, container);
+        View rootView;
+        if(setCustomLayout() == -10) {
+            rootView = inflater.inflate(R.layout.jcommon_abslist, container);
+        }else {
+            rootView = inflater.inflate(setCustomLayout(), container);
+        }
         mCommonRecv = (RecyclerView)rootView.findViewById(R.id.common_recv);
         mSwipeRefreshLayout = (SwipeRefreshLayout)rootView.findViewById(R.id.common_swipe);
         initRecView();
         initSwipeLayout();
+    }
+
+    public int setCustomLayout(){
+        return -10;
     }
 
     private void initSwipeLayout(){
@@ -101,7 +110,7 @@ public abstract class JAbsListFrgmt extends JBaseTitleFrgmt implements SwipeRefr
     }
 
     protected boolean setEnableUpMore(){
-        return true;
+        return false;
     }
 
 
@@ -111,12 +120,12 @@ public abstract class JAbsListFrgmt extends JBaseTitleFrgmt implements SwipeRefr
 
     @Override
     public void onRefresh(){
-//        mSwipeRefreshLayout.setRefreshing(false);
+        //        mSwipeRefreshLayout.setRefreshing(false);
     }
 
 
     public boolean setEnableSwipeRefresh(){
-        return true;
+        return false;
     }
 
     @Override

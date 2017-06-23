@@ -47,7 +47,7 @@ ext {
             butterknife   : "com.jakewharton:butterknife:${libsVersion.butterknife}",
             rxjava2       : "io.reactivex.rxjava2:rxjava:${libsVersion.rxjava2}",
             rxandroid     : "io.reactivex.rxjava2:rxandroid:${libsVersion.rxandroid}",
-            jtabstrip    :"com.yun.ospl:jtabstrip:${libsVersion.jtabstrip}",
+            jtabstrip     :"com.yun.ospl:jtabstrip:${libsVersion.jtabstrip}",
 
             constraint    : "com.android.support.constraint:constraint-layout:${libsVersion.constraint}",
             picasso       : "com.squareup.picasso:picasso:${libsVersion.picasso}",

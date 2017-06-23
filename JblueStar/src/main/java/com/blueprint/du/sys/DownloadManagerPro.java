@@ -1,7 +1,6 @@
 package com.blueprint.du.sys;
 
 import android.app.DownloadManager;
-import android.app.DownloadManager.Request;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -13,7 +12,7 @@ import com.blueprint.helper.FileHelper;
 import java.io.File;
 import java.lang.reflect.Method;
 
-import static com.blueprint.error.ErrorMsg.DEFAULTERROR;
+import static com.blueprint.Consistent.DEFAULTERROR;
 
 /**
  * DownloadManagerPro

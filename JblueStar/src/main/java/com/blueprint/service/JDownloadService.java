@@ -20,7 +20,7 @@ import com.blueprint.LibApp;
 import com.blueprint.R;
 import com.blueprint.du.DownloadCell;
 import com.blueprint.du.sys.DownloadManagerPro;
-import com.blueprint.error.ErrorMsg;
+import com.blueprint.Consistent;
 import com.blueprint.helper.SpHelper;
 
 import io.reactivex.Observable;
@@ -30,7 +30,7 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 
-import static com.blueprint.error.ErrorMsg.DEFAULTERROR;
+import static com.blueprint.Consistent.DEFAULTERROR;
 import static com.blueprint.helper.FileHelper.doClearFile;
 import static com.blueprint.helper.FileHelper.getFileDownloadPath;
 import static com.blueprint.helper.FileHelper.getFileDownloadPath_file;
@@ -187,7 +187,7 @@ public class JDownloadService extends Service {
     }
 
     public void startDownload(String downUrl){
-        if(String.valueOf(ErrorMsg.DEFAULTERROR).equals(mDownloadCell.getDownloadID())) {
+        if(String.valueOf(Consistent.DEFAULTERROR).equals(mDownloadCell.getDownloadID())) {
             //使用ok
 
 
