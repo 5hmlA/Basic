@@ -9,10 +9,11 @@ import io.reactivex.Single;
 
 import static com.blueprint.helper.FileHelper.clearFile;
 import static com.blueprint.helper.FileHelper.getDirSize;
+import static com.blueprint.helper.PhoneHelper.strongClearCache;
 
 public class JSettingCenter {
 
-    public static Set<String> sMsaveDataUrls = new HashSet<>();
+    public static final Set<String> sMsaveDataUrls = new HashSet<>();
 
     public static void needSaveDataUrl(String url){
         sMsaveDataUrls.add(url);
@@ -33,24 +34,30 @@ public class JSettingCenter {
     /**
      * 计算缓存大小
      */
-    public static Single<Long> dirSizeObserver(){
-        return getDirSize(LibApp.getContext().getCacheDir());
+    public static Single<Long> cacheSizeObserver(){
+        return getDirSize(LibApp.getContext().getCacheDir(), LibApp.getContext().getExternalCacheDir());
     }
 
     /**
      * 清除缓存
      */
     public static Single<Boolean> clearAppCache(){
-        return clearFile(LibApp.getContext().getCacheDir());
-
+        return clearFile(LibApp.getContext().getCacheDir(), LibApp.getContext().getExternalCacheDir());
     }
 
-    public static boolean isAutoDownloadNewApp(){
-        return (boolean)SpHelper.sget("auto_downnewapp", false);
-    }
+//    /**
+//     * 计算缓存大小
+//     */
+//    public static Observable<Long> strongCacheSizeObserver(){
+//        //        return getDirSize(LibApp.getContext().getCacheDir(), LibApp.getContext().getExternalCacheDir());
+//        return null;
+//    }
 
-    public static void setAutoDownloadNewApp(boolean isEnable){
-        SpHelper.sput("auto_downnewapp", isEnable);
+    /**
+     * 强力清除app缓存缓存
+     * <p>类似app详情页的清除缓存，清除后会被清除进程app被强制关闭</p>
+     */
+    public static void strongClearAppCache(){
+        strongClearCache(LibApp.getPackageName());
     }
-
 }

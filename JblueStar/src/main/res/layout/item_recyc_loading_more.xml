@@ -2,15 +2,19 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:gravity="center_horizontal"
+              android:minHeight="30dp"
               android:padding="5dp"
+              android:animateLayoutChanges="true"
               android:layout_height="wrap_content">
     <ProgressBar
+        android:id="@+id/recyc_item_pb_loadmore"
         android:layout_width="30dp"
         android:layout_height="30dp"/>
     <TextView
         android:id="@+id/recyc_item_tv_loadmore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
         android:layout_gravity="center_vertical"
         android:text="@string/jonas_recyc_loading_more"/>
 

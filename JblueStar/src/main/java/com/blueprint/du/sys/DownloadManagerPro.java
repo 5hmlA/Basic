@@ -41,6 +41,7 @@ import static com.blueprint.Consistent.DEFAULTERROR;
  * @author <a href="http://www.trinea.cn" target="_blank">Trinea</a> 2013-5-4
  */
 public class DownloadManagerPro {
+    public final static String DOWNLOADACTION = "android.intent.action.DOWNLOAD_COMPLETE";
     //测试可用
     public final static String URL = "http://dldir1.qq.com/weixin/android/weixin6330android920.apk";
     public final static String URL1 = "https://qd.myapp.com/myapp/qqteam/AndroidQQ/mobileqq_android.apk";
@@ -57,6 +58,7 @@ public class DownloadManagerPro {
 
     public static final String METHOD_NAME_PAUSE_DOWNLOAD = "pauseDownload";
     public static final String METHOD_NAME_RESUME_DOWNLOAD = "resumeDownload";
+    public static final int DEFAULT_NOTIFY = -111;
 
     private static boolean isInitPauseDownload = false;
     private static boolean isInitResumeDownload = false;
@@ -83,6 +85,36 @@ public class DownloadManagerPro {
         return mDownloadManager.enqueue(request);
     }
 
+    public long download(String url, String savePath, String title, boolean onlyWify, int notifyconfig){
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+
+        //将文件下载到自己的Download文件夹下,必须是External的
+        //这是DownloadManager的限制
+        File file = new File(savePath);
+        request.setDestinationUri(Uri.fromFile(file));
+        request.setTitle(title);
+        if(notifyconfig != DEFAULT_NOTIFY)
+        //表示下载进行中和下载完成的通知栏是否显示。默认只显示下载中通知。VISIBILITY_VISIBLE_NOTIFY_COMPLETED表示下载完成后显示通知栏提示
+        //request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        //        Request.VISIBILITY_VISIBLE：在下载进行的过程中，通知栏中会一直显示该下载的Notification，当下载完成时，该Notification会被移除，这是默认的参数值。
+        //        Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED：在下载过程中通知栏会一直显示该下载的Notification，在下载完成后该Notification会继续显示，直到用户点击该
+        //        Notification或者消除该Notification。
+        //        Request.VISIBILITY_VISIBLE_NOTIFY_ONLY_COMPLETION：只有在下载完成后该Notification才会被显示。
+        //        Request.VISIBILITY_HIDDEN：不显示该下载请求的Notification。如果要使用这个参数，需要在应用的清单文件中加上DOWNLOAD_WITHOUT_NOTIFICATION权限。
+        {
+            request.setNotificationVisibility(notifyconfig);
+        }
+
+        /**设置下载文件的类型*/
+        request.setMimeType("application/vnd.android.package-archive");
+        //表示允许MediaScanner扫描到这个文件，默认不允许。
+        //        request.allowScanningByMediaScanner();
+        //表示下载允许的网络类型，默认在任何网络下都允许下载
+        if(onlyWify) {
+            request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI);
+        }
+        return startDownload(request);
+    }
     public long downloadApp(String url, String saveName, String title, boolean onlyWify, int notifyconfig){
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
 
@@ -90,6 +122,7 @@ public class DownloadManagerPro {
         //这是DownloadManager的限制
         File file = FileHelper.getFileDownloadPath_file(saveName);
         request.setDestinationUri(Uri.fromFile(file));
+//        request.setDestinationInExternalPublicDir("/download/",saveName);
         request.setTitle(title);
         if(notifyconfig != DEFAULTERROR)
         //表示下载进行中和下载完成的通知栏是否显示。默认只显示下载中通知。VISIBILITY_VISIBLE_NOTIFY_COMPLETED表示下载完成后显示通知栏提示
@@ -195,7 +228,13 @@ public class DownloadManagerPro {
      * <ul>
      * <li>result[0] 已下大小.</li>
      * <li>result[1] 总大小 -1.</li>
-     * <li>result[2] 下载状态 0.</li>
+     * <li>result[2] 下载状态 0. </li>
+     * <li>DownloadManager.STATUS_FAILED</li>
+     * <li>DownloadManager.STATUS_PAUSED</li>
+     * <li>DownloadManager.STATUS_PENDING</li>
+     * <li>DownloadManager.STATUS_RUNNING</li>
+     * <li>DownloadManager.STATUS_SUCCESSFUL</li>
+     * <li>DownloadManager.STATUS_FAILED</li>
      * </ul>
      */
     public int[] getBytesAndStatus(DownloadManager.Query query){

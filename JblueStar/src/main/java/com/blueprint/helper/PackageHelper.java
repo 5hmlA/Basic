@@ -1,23 +1,33 @@
 package com.blueprint.helper;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.ActivityManager.RunningTaskInfo;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.Signature;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.blueprint.LibApp;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.util.List;
+
+import io.reactivex.annotations.NonNull;
 
 import static com.blueprint.LibApp.getContext;
 import static com.blueprint.helper.CheckHelper.checkLists;
@@ -57,8 +67,10 @@ public class PackageHelper {
      * @param apkPath
      */
     public static void install(String apkPath){
-        install(apkPath, checkRootPermission());
+        //        install(apkPath, checkRootPermission());
+        installNormal(apkPath);
     }
+
 
     /**
      * @param apkPath
@@ -100,9 +112,9 @@ public class PackageHelper {
     }
 
     //通过Root方式安装
-    private static void installRoot(String apkPath){
-        File file = new File(apkPath);
-        if(apkPath == null || apkPath.length() == 0 || ( file = new File(apkPath) ) == null || file.length()<=0 || !file
+    private static void installRoot(@NonNull String apkPath){
+        File file = null;
+        if(TextUtils.isEmpty(apkPath) || ( file = new File(apkPath) ) == null || file.length()<=0 || !file
                 .exists() || !file.isFile()) {
             LogHelper.Log_e("安装失败");
         }
@@ -200,19 +212,31 @@ public class PackageHelper {
      */
     public static Boolean isTopActivity(String packageName){
         if(TextUtils.isEmpty(packageName)) {
-            return null;
+            return false;
         }
 
         ActivityManager activityManager = (ActivityManager)getContext().getSystemService(Context.ACTIVITY_SERVICE);
         List<RunningTaskInfo> tasksInfo = activityManager.getRunningTasks(1);
         if(!checkLists(tasksInfo)) {
-            return null;
+            return false;
         }
         try {
             return packageName.equals(tasksInfo.get(0).topActivity.getPackageName());
         }catch(Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+
+    public static ComponentName getTopActivity(){
+
+        ActivityManager activityManager = (ActivityManager)getContext().getSystemService(Context.ACTIVITY_SERVICE);
+
+        if(Build.VERSION.SDK_INT>20) {
+            return activityManager.getRunningAppProcesses().get(0).importanceReasonComponent;
+        }else {
+            return activityManager.getRunningTasks(1).get(0).topActivity;
         }
     }
 
@@ -238,11 +262,46 @@ public class PackageHelper {
     }
 
     /**
-     * start InstalledAppDetails Activity
+     * 获取App图标
+     */
+    public static Drawable getAppIcon(){
+        return getAppIcon(getContext().getPackageName());
+    }
+
+    /**
+     * 获取App图标
+     *
+     * @param packageName
+     *         包名
+     * @return App图标
+     */
+    public static Drawable getAppIcon(final String packageName){
+        if(TextUtils.isEmpty(packageName)) {
+            return null;
+        }
+        try {
+            PackageManager pm = LibApp.getContext().getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(packageName, 0);
+            return pi == null ? null : pi.applicationInfo.loadIcon(pm);
+        }catch(PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * 跳转到应用管理中的应用详情界面
+     */
+    public static void toInstalledAppDetails(){
+        toInstalledAppDetails(getContext().getPackageName());
+    }
+
+    /**
+     * 跳转到应用管理中的应用详情界面
      *
      * @param packageName
      */
-    public static void startInstalledAppDetails(String packageName){
+    public static void toInstalledAppDetails(String packageName){
         Intent intent = new Intent();
         int sdkVersion = Build.VERSION.SDK_INT;
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.GINGERBREAD) {
@@ -257,5 +316,183 @@ public class PackageHelper {
         }
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getContext().startActivity(intent);
+    }
+
+    public static boolean isProcessRunning(String processSuffix){
+        ActivityManager manager = (ActivityManager)LibApp.getContext().getSystemService(Context.ACTIVITY_SERVICE);
+        List<RunningAppProcessInfo> infoList = manager.getRunningAppProcesses();
+        for(RunningAppProcessInfo info : infoList) {
+            Log.e("~~~processName", info.processName);
+            if(info.processName.endsWith(processSuffix)) {
+                Log.e(processSuffix+"~~~Running", "true");
+                return true;
+            }else {
+                Log.e(processSuffix+"~~~Running", "false");
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 判断App是否是Debug版本
+     *
+     * @return {@code true}: 是<br>{@code false}: 否
+     */
+    public static boolean isAppDebug(){
+        return isAppDebug(getContext().getPackageName());
+    }
+
+    /**
+     * 判断App是否是Debug版本
+     *
+     * @param packageName
+     *         包名
+     * @return {@code true}: 是<br>{@code false}: 否
+     */
+    public static boolean isAppDebug(final String packageName){
+        if(TextUtils.isEmpty(packageName)) {
+            return false;
+        }
+        try {
+            PackageManager pm = getContext().getPackageManager();
+            ApplicationInfo ai = pm.getApplicationInfo(packageName, 0);
+            return ai != null && ( ai.flags&ApplicationInfo.FLAG_DEBUGGABLE ) != 0;
+        }catch(PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 获取App签名
+     *
+     * @return App签名
+     */
+    public static Signature[] getAppSignature(){
+        return getAppSignature(getContext().getPackageName());
+    }
+
+    /**
+     * 获取App签名
+     *
+     * @param packageName
+     *         包名
+     * @return App签名
+     */
+    public static Signature[] getAppSignature(final String packageName){
+        if(TextUtils.isEmpty(packageName)) {
+            return null;
+        }
+        try {
+            PackageManager pm = getContext().getPackageManager();
+            @SuppressLint("PackageManagerGetSignatures") PackageInfo pi = pm
+                    .getPackageInfo(packageName, PackageManager.GET_SIGNATURES);
+            return pi == null ? null : pi.signatures;
+        }catch(PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * 获取应用签名的的SHA1值
+     * <p>可据此判断高德，百度地图key是否正确</p>
+     *
+     * @return 应用签名的SHA1字符串, 比如：53:FD:54:DC:19:0F:11:AC:B5:22:9E:F1:1A:68:88:1B:8B:E8:54:42
+     */
+    public static String getAppSignatureSHA1(){
+        return getAppSignatureSHA1(getContext().getPackageName());
+    }
+
+    /**
+     * 获取应用签名的的SHA1值
+     * <p>可据此判断高德，百度地图key是否正确</p>
+     *
+     * @param packageName
+     *         包名
+     * @return 应用签名的SHA1字符串, 比如：53:FD:54:DC:19:0F:11:AC:B5:22:9E:F1:1A:68:88:1B:8B:E8:54:42
+     */
+    public static String getAppSignatureSHA1(final String packageName){
+        Signature[] signature = getAppSignature(packageName);
+        if(signature == null) {
+            return null;
+        }
+        return EncryptUtils.encryptSHA1ToString(signature[0].toByteArray()).
+                replaceAll("(?<=[0-9A-F]{2})[0-9A-F]{2}", ":$0");
+    }
+
+    /**
+     * 判断App是否处于前台
+     *
+     * @return {@code true}: 是<br>{@code false}: 否
+     */
+    public static boolean isAppForeground(){
+        ActivityManager manager = (ActivityManager)getContext().getSystemService(Context.ACTIVITY_SERVICE);
+        List<RunningAppProcessInfo> info = manager.getRunningAppProcesses();
+        if(info == null || info.size() == 0) {
+            return false;
+        }
+        for(RunningAppProcessInfo aInfo : info) {
+            if(aInfo.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                return aInfo.processName.equals(getContext().getPackageName());
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 判断App是否处于前台
+     * <p>当不是查看当前App，且SDK大于21时，
+     * 需添加权限 {@code <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"/>}</p>
+     *
+     * @param packageName
+     *         包名
+     * @return {@code true}: 是<br>{@code false}: 否
+     */
+    public static boolean isAppForeground(final String packageName){
+        return false;
+    }
+
+
+    public static String getProcessName(int pid) {
+        ActivityManager am = (ActivityManager) LibApp.getContext().getSystemService(Context.ACTIVITY_SERVICE);
+        List<RunningAppProcessInfo> runningApps = am.getRunningAppProcesses();
+        if (runningApps == null) {
+            return null;
+        }
+        for (RunningAppProcessInfo procInfo : runningApps) {
+            if (procInfo.pid == pid) {
+                return procInfo.processName;
+            }
+        }
+        return null;
+    }
+
+    public static String getProcessName() {
+        try {
+            File file = new File("/proc/" + android.os.Process.myPid() + "/" + "cmdline");
+            BufferedReader mBufferedReader = new BufferedReader(new FileReader(file));
+            String processName = mBufferedReader.readLine().trim();
+            mBufferedReader.close();
+            return processName;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    //todo   动态还appicon  http://blog.csdn.net/eclipsexys/article/details/53791818
+    public static void enableComponent(ComponentName componentName) {
+        PackageManager packageManager = LibApp.getContext().getPackageManager();
+        packageManager.setComponentEnabledSetting(componentName,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
+    }
+
+    public static void disableComponent(ComponentName componentName) {
+        PackageManager packageManager = LibApp.getContext().getPackageManager();
+        packageManager.setComponentEnabledSetting(componentName,
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP);
     }
 }

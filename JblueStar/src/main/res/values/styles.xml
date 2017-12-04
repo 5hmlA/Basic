@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--android:backgroundTint="@color/yourColor" 特别的属性 -->
     <style name="paomadeng" parent="@android:style/TextAppearance">
         <item name="android:ellipsize">marquee</item>
         <item name="android:marqueeRepeatLimit">marquee_forever</item>
@@ -15,12 +16,48 @@
         <item name="android:windowIsFloating">true</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
         <item name="android:backgroundDimEnabled">true</item>
     </style>
 
     <style name="po" parent="Theme.AppCompat.NoActionBar">
         <item name="colorAccent">@color/accent_material_dark_1</item>
+    </style>
+
+    <style name="jWindowAni.mz" parent="@android:style/Animation.Activity">
+        <!--A打开B，B的出现动画-->
+        <item name="android:activityOpenEnterAnimation">@anim/jwindow_enter</item>
+        <!--A打开B，A的消失动画-->
+        <item name="android:activityOpenExitAnimation">@anim/jwindow_enter</item>
+        <!--A关闭B，B的出现动画-->
+        <item name="android:activityCloseExitAnimation">@anim/jwindow_enter</item>
+        <!--A关闭B，A的消失动画-->
+        <item name="android:activityCloseEnterAnimation">@anim/jwindow_enter</item>
+    </style>
+
+    <style name="jmarqueue" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:ellipsize">marquee</item><!--//设置超出显示区域的内容以跑马灯效果呈现，该值还可以设置成END, START等，就是我们常见的在末尾"..."显示。-->
+        <item name="android:singleLine">true</item><!--//跑马灯启动的条件之一，另外官方推荐说该方法已废弃推荐使用maxLines="1",
+        不用去鸟他，用maxLines的话跑马灯效果也不会启动。-->
+        <item name="android:focusable">true</item><!--//跑马灯启动的条件之一-->
+        <item name="android:focusableInTouchMode">true</item><!--//跑马灯启动的条件之一-->
+        <item name="android:marqueeRepeatLimit">-1</item><!--//设置循环几次，-1表示无限循环-->
+    </style>
+    <!--1.android:ellipsize=”start”—–省略号显示在开头-->
+    <!--2.Android:ellipsize=”end”——省略号显示在结尾-->
+    <!--3.android:ellipsize=”middle”—-省略号显示在中间-->
+    <!--4.android:ellipsize=”marquee”–以跑马灯的方式显示(动画横向移动)-->
+
+
+    <style name="iosBottomAniStyle" parent="@android:style/Animation.Dialog">
+        <item name="android:windowEnterAnimation">@anim/ios_push_up_in</item>
+        <!-- 进入时的动画 -->
+        <item name="android:windowExitAnimation">@anim/ios_push_down_out</item>
+        <!-- 退出时的动画 -->
+    </style>
+
+    <style name="jSpinnerStyle" parent="Widget.AppCompat.ListView.DropDown">
+        <item name="android:divider">@color/j_black_a60</item>
+        <item name="android:dividerHeight">0.5dip</item>
     </style>
 
 </resources>

@@ -1,9 +1,7 @@
 <resources>
     <string name="app_name">Yun-Library</string>
-    <string name="layout_basestate_retry">点击重试</string>
+    <string name="dialog_confirm">确定</string>
+    <string name="dialog_cancel">取消</string>
+    <string name="jlib_share_title">分享至</string>
 
-    <string name="jonas_recyc_loading_more">加载更多</string>
-    <string name="jonas_recyc_load_retry">点击重试</string>
-    <string name="jdouble_exit">再按一次退出</string>
-    <string name="j_d_newversion">版本更新..</string>
 </resources>

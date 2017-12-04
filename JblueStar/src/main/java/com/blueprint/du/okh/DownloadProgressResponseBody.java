@@ -10,21 +10,25 @@ import okio.ForwardingSource;
 import okio.Okio;
 import okio.Source;
 
+import static com.blueprint.helper.StrHelper.safeObject2Str;
+
 /**
  * @another 江祖赟
  * @date 2017/6/14.
  */
 public class DownloadProgressResponseBody extends ResponseBody {
 
+    private String mUrl;
     //实际相应体
     private ResponseBody mResponseBody;
-    private ProgressListener mProgressListener;
+    private ProgressListener mProgressListeners;
     //包装BufferedSource计算进度
     private BufferedSource mBufferedSource;
 
-    public DownloadProgressResponseBody(ResponseBody responseBody, ProgressListener progressListener){
+    public DownloadProgressResponseBody(String url, ResponseBody responseBody, ProgressListener progressListener){
+        mUrl = safeObject2Str(url);
         mResponseBody = responseBody;
-        mProgressListener = progressListener;
+        mProgressListeners = progressListener;
     }
 
     @Override
@@ -39,7 +43,7 @@ public class DownloadProgressResponseBody extends ResponseBody {
 
     @Override
     public BufferedSource source(){
-        if (mBufferedSource == null) {
+        if(mBufferedSource == null) {
             mBufferedSource = Okio.buffer(source(mResponseBody.source()));
         }
         return mBufferedSource;
@@ -47,17 +51,17 @@ public class DownloadProgressResponseBody extends ResponseBody {
 
     private Source source(BufferedSource source){
         return new ForwardingSource(source) {
-            long mTotalbytesread = 0L;
+            long mTotalDownloaded = 0L;
 
             @Override
             public long read(Buffer sink, long byteCount) throws IOException{
                 long bytesRead = super.read(sink, byteCount);
                 // read() returns the number of bytes read, or -1 if this source is exhausted.
                 //如果读取完成了bytesRead会返回-1
-                mTotalbytesread += bytesRead != -1 ? bytesRead : 0;
-
-                if (null != mProgressListener) {
-                    mProgressListener.onProgress(mTotalbytesread, mResponseBody.contentLength(),bytesRead==-1);
+                mTotalDownloaded += bytesRead != -1 ? bytesRead : 0;
+                if(null != mProgressListeners) {
+                    mProgressListeners
+                            .onProgress(mTotalDownloaded, mResponseBody.contentLength(), bytesRead == -1, mUrl);
                 }
                 return bytesRead;
             }

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bye_burger_bottom_behavior" translatable="false">com.blueprint.behavior.byeburgernavigationview.ByeBurgerBottomBehavior</string>
+    <string name="bye_burger_title_behavior" translatable="false">com.blueprint.behavior.byeburgernavigationview.ByeBurgerTitleBehavior</string>
+    <string name="scrolling_view_behavior" translatable="false">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
+    <color name="cw_item_crash">#00000000</color>
+    <color name="cw_item_crash_selected">#5a000000</color>
+    <color name="cw_my_fault">#04f20c</color>
+    <color name="cw_trace_text">#FF6B68</color>
+    <color name="cw_windowBackground">#373636</color>
+
+
+    <string name="jonas_recyc_loading_more">Loading…</string>
+    <string name="jonas_recyc_load_retry">Retry</string>
+    <string name="jdouble_exit">Double Click Exit!</string>
+    <string name="j_d_newversion">Version Update..</string>
+    <string name="jbase_comment_send">SEND</string>
+    <string name="layout_basestate_retry">Retry</string>
+    <string name="cw_action_download">Download</string>
+    <string name="cw_action_restart">Restart</string>
+    <string name="cw_action_settings">Settings</string>
+    <string name="cw_default_page_name" translatable="false">CrashWrapper</string>
+    <string name="cw_error_message">Sorry! There is something wrong with the App. \n\nPlease click <b>DOWNLOAD</b> to download a new stable version, or click RESTART to restart current App and retry.</string>
+    <string name="cw_error_title">Error</string>
+    <string name="cw_hello_woodpecker">Hello Crash Woodpecker!</string>
+    <string name="cw_share">Share logs to…</string>
+
+
+    <style name="Base.Theme.Pecker" parent="android:Theme.Black"/>
+    <style name="CWLineTextAppearance">
+        <item name="android:textColor">@color/cw_my_fault</item>
+    </style>
+    <style name="Theme.crashwraper" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:background">@color/cw_windowBackground</item>
+    </style>
+    <style name="Theme.crashwraper.Dialog" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item>　
+    </style>
+</resources>

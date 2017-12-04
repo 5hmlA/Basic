@@ -1,13 +1,23 @@
 package com.blueprint.helper;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.telephony.TelephonyManager;
 
 import com.blueprint.LibApp;
+
+import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
+import java.util.regex.Pattern;
 
 public class NetHelper {
 
@@ -22,6 +32,11 @@ public class NetHelper {
     private static final int NETWORK_TYPE_TD_SCDMA = 17;
     private static final int NETWORK_TYPE_IWLAN = 18;
     private static String mUserAgent = null;
+    /**
+     * Ipv4地址检查
+     */
+    private static final Pattern IPV4_PATTERN = Pattern.compile(
+            "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$");
 
     /**
      * 打开网络设置界面
@@ -40,8 +55,13 @@ public class NetHelper {
      * @return NetworkInfo
      */
     private static NetworkInfo getActiveNetworkInfo(){
-        ConnectivityManager cm = (ConnectivityManager)LibApp.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        return cm.getActiveNetworkInfo();
+        if(LibApp.getContext() != null) {
+            ConnectivityManager cm = (ConnectivityManager)LibApp.getContext()
+                    .getSystemService(Context.CONNECTIVITY_SERVICE);
+            return cm.getActiveNetworkInfo();
+        }else {
+            return null;
+        }
     }
 
     /**
@@ -58,6 +78,7 @@ public class NetHelper {
     /**
      * 判断网络是否连接
      * <p>需添加权限 {@code <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>}</p>
+     *
      * @return {@code true}: 是<br>{@code false}: 否
      */
     public static boolean isConnected(){
@@ -68,6 +89,7 @@ public class NetHelper {
     /**
      * 判断网络是否是4G
      * <p>需添加权限 {@code <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>}</p>
+     *
      * @return {@code true}: 是<br>{@code false}: 不是
      */
     public static boolean is4G(){
@@ -82,7 +104,8 @@ public class NetHelper {
      * @return {@code true}: 连接<br>{@code false}: 未连接
      */
     public static boolean isWifionnected(){
-        ConnectivityManager cm = (ConnectivityManager)LibApp.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager cm = (ConnectivityManager)LibApp.getContext()
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
         return cm != null && cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo()
                 .getType() == ConnectivityManager.TYPE_WIFI;
     }
@@ -189,6 +212,7 @@ public class NetHelper {
     /**
      * 获取当前的网络类型(WIFI,2G,3G,4G)
      * <p>依赖上面的方法</p>
+     *
      * @return 网络类型名称
      * <ul>
      * <li>NETWORK_WIFI   </li>
@@ -230,4 +254,89 @@ public class NetHelper {
         return mUserAgent;
     }
 
+    /**
+     * 获取ip地址的函数
+     * 2016年4月25日 16:08:06
+     */
+    public static String getIP(){
+        //获取wifi服务
+        WifiManager wifiManager = (WifiManager)LibApp.getContext().getSystemService(Context.WIFI_SERVICE);
+        //判断wifi是否开启
+        if(!wifiManager.isWifiEnabled()) {
+            //GetIPAddressUtil.getMobileIP();
+            try {
+                for(Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en
+                        .hasMoreElements(); ) {
+                    NetworkInterface intf = en.nextElement();
+                    for(Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
+                        InetAddress inetAddress = enumIpAddr.nextElement();
+                        if(!inetAddress.isLoopbackAddress() && isIPv4Address(inetAddress.getHostAddress())) {
+                            return inetAddress.getHostAddress().toString();
+                        }
+                    }
+                }
+            }catch(SocketException e) {
+                e.printStackTrace();
+            }
+        }else {
+            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+            int ipAddress = wifiInfo.getIpAddress();
+            String ip = intToIp(ipAddress);
+            return ip;
+        }
+        return null;
+    }
+
+    private static String intToIp(int i){
+        return ( i&0xFF )+"."+( ( i>>8 )&0xFF )+"."+( ( i>>16 )&0xFF )+"."+( i>>24&0xFF );
+    }
+
+    /**
+     * 检查是否是有效的IPV4地址
+     */
+    private static boolean isIPv4Address(final String input){
+        return IPV4_PATTERN.matcher(input).matches();
+
+    }
+
+    /**
+     * 打开或关闭移动数据
+     * <p>需系统应用 需添加权限{@code <uses-permission android:name="android.permission.MODIFY_PHONE_STATE"/>}</p>
+     *
+     * @param enabled
+     *         {@code true}: 打开<br>{@code false}: 关闭
+     */
+    public static void setDataEnabled(final boolean enabled){
+        try {
+            TelephonyManager tm = (TelephonyManager)LibApp.getContext().getSystemService(Context.TELEPHONY_SERVICE);
+            Method setMobileDataEnabledMethod = tm.getClass().getDeclaredMethod("setDataEnabled", boolean.class);
+            if(null != setMobileDataEnabledMethod) {
+                setMobileDataEnabledMethod.invoke(tm, enabled);
+            }
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * 打开或关闭wifi
+     * <p>需添加权限 {@code <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>}</p>
+     *
+     * @param enabled
+     *         {@code true}: 打开<br>{@code false}: 关闭
+     */
+    public static void setWifiEnabled(final boolean enabled){
+        @SuppressLint("WifiManagerLeak") WifiManager wifiManager = (WifiManager)LibApp.getContext()
+                .getSystemService(Context.WIFI_SERVICE);
+        if(enabled) {
+            if(!wifiManager.isWifiEnabled()) {
+                wifiManager.setWifiEnabled(true);
+            }
+        }else {
+            if(wifiManager.isWifiEnabled()) {
+                wifiManager.setWifiEnabled(false);
+            }
+        }
+    }
 }

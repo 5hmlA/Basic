@@ -1,6 +1,9 @@
 package com.blueprint.adapter;
 
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.support.annotation.ColorInt;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.SparseArray;
@@ -18,10 +21,28 @@ public class RecyclerHolder extends RecyclerView.ViewHolder {
     private final SparseArray<View> mCacheViews;
     private String tag = RecyclerHolder.class.getSimpleName();
     public static final String TAG_LOADING = "loadingholder";
+    private final Context mContext;
+    public int position;
+    public int viewType;
+
+    public <E> E getExtra(){
+        return (E)extra;
+    }
+
+    public <E> void setExtra(E extra){
+        this.extra = extra;
+    }
+
+    private Object extra;
 
     public RecyclerHolder(View itemView){
         super(itemView);
+        mContext = itemView.getContext();
         mCacheViews = new SparseArray<>(10);
+    }
+
+    public Context getContext(){
+        return mContext;
     }
 
     public <V extends View> V getView(int viewId){
@@ -42,23 +63,79 @@ public class RecyclerHolder extends RecyclerView.ViewHolder {
         return (V)view;
     }
 
-    public RecyclerHolder setText(int viewId, String text){
+    public RecyclerHolder setText(int viewId, CharSequence text){
+        TextView textView = getView(viewId);
         if(!TextUtils.isEmpty(text)) {
-            TextView textView = getView(viewId);
-            textView.setText(text);
+            textView.setVisibility(View.VISIBLE);
+            if(!text.equals(textView.getText())) {
+                textView.setText(text);
+            }
+        }else {
+            textView.setVisibility(View.GONE);
+        }
+        return this;
+    }
+
+    public RecyclerHolder setText(int viewId, CharSequence text, int colorRes){
+        TextView textView = getView(viewId);
+        if(!TextUtils.isEmpty(text)) {
+            textView.setVisibility(View.VISIBLE);
+            textView.setTextColor(ContextCompat.getColor(textView.getContext(), colorRes));
+            if(!text.equals(textView.getText())) {
+                textView.setText(text);
+            }
+        }else {
+            textView.setVisibility(View.GONE);
+        }
+        return this;
+    }
+
+    public RecyclerHolder setText2(int viewId, CharSequence text, @ColorInt int color){
+        TextView textView = getView(viewId);
+        if(!TextUtils.isEmpty(text)) {
+            textView.setVisibility(View.VISIBLE);
+            textView.setTextColor(color);
+            if(!text.equals(textView.getText())) {
+                textView.setText(text);
+            }
+        }else {
+            textView.setVisibility(View.GONE);
         }
         return this;
     }
 
     public RecyclerHolder setText(int viewId, int strRes){
         TextView textView = getView(viewId);
-        textView.setText(textView.getContext().getResources().getString(strRes));
+        if(textView != null) {
+            String text = textView.getContext().getResources().getString(strRes);
+            if(!text.equals(textView.getText())) {
+                textView.setText(text);
+            }
+        }
         return this;
     }
 
     public RecyclerHolder setVisibility(int viewId, int visibility){
         View view = getView(viewId);
-        view.setVisibility(visibility);
+        if(view != null) {
+            view.setVisibility(visibility);
+        }
+        return this;
+    }
+
+    public RecyclerHolder goneViews(int... viewId){
+        for(int i : viewId) {
+            View view = getView(i);
+            view.setVisibility(View.GONE);
+        }
+        return this;
+    }
+
+    public RecyclerHolder visibleViews(int... viewId){
+        for(int i : viewId) {
+            View view = getView(i);
+            view.setVisibility(View.VISIBLE);
+        }
         return this;
     }
 
@@ -78,7 +155,9 @@ public class RecyclerHolder extends RecyclerView.ViewHolder {
      */
     public RecyclerHolder setImageResource(int viewId, int drawableId){
         ImageView view = getView(viewId);
-        view.setImageResource(drawableId);
+        if(view != null) {
+            view.setImageResource(drawableId);
+        }
         return this;
     }
 
@@ -86,15 +165,14 @@ public class RecyclerHolder extends RecyclerView.ViewHolder {
      * 为ImageView设置图片
      */
     public RecyclerHolder setImageUrl(int viewId, String url){
-        if(!TextUtils.isEmpty(url)) {
-            if(url.startsWith("http")) {
-                ImageView view = getView(viewId);
+        ImageView view = getView(viewId);
+        if(view != null) {
+            if(!TextUtils.isEmpty(url)) {
+                view.setVisibility(View.VISIBLE);
                 PicHelper.loadImage(url, view);
             }else {
-                setImageAsset(viewId, url);
+                view.setVisibility(View.GONE);
             }
-        }else {
-            setImageResource(viewId, com.blueprint.R.mipmap.ic_launcher);
         }
         return this;
     }
@@ -106,7 +184,7 @@ public class RecyclerHolder extends RecyclerView.ViewHolder {
         if(!TextUtils.isEmpty(url)) {
             if(url.startsWith("http")) {
                 ImageView view = getView(viewId);
-                //                Picasso.with(view.getContext()).load(url).resize(reWidth, reHeight).centerCrop().into(view);
+                PicHelper.loadImage(url, view, reWidth, reHeight);
             }else {
                 setImageAsset(viewId, url, reWidth, reHeight);
             }
@@ -129,7 +207,7 @@ public class RecyclerHolder extends RecyclerView.ViewHolder {
     public RecyclerHolder setImageAsset(int viewId, String picPath, int reWidth, int reHeight){
         if(!TextUtils.isEmpty(picPath)) {
             ImageView view = getView(viewId);
-            //            Picasso.with(view.getContext()).load("file:///android_asset/img/" + picPath).resize(reWidth, reHeight).centerCrop().into(view);
+            PicHelper.loadImage("file:///android_asset/"+picPath, view, reWidth, reHeight);
         }
         return this;
     }
@@ -140,14 +218,31 @@ public class RecyclerHolder extends RecyclerView.ViewHolder {
     public RecyclerHolder setImageAsset(int viewId, String picPath){
         if(!TextUtils.isEmpty(picPath)) {
             ImageView view = getView(viewId);
-            //            Picasso.with(view.getContext()).load("file:///android_asset/img/" + picPath).into(view);
+            //            if(!isEqual(view.getTag(EQUALTAG), picPath)) {
+            //                view.setTag(EQUALTAG, picPath);//不是同一个url才重新显示图片
+            //            }
+            PicHelper.loadImage("file:///android_asset/"+picPath, view);
+        }
+        return this;
+    }
+
+    public RecyclerHolder setOnLongClickListener(int viewId, View.OnLongClickListener l){
+        View view = getView(viewId);
+        if(view != null) {
+            view.setOnLongClickListener(l);
         }
         return this;
     }
 
     public RecyclerHolder setOnClickListener(int viewId, View.OnClickListener l){
         View view = getView(viewId);
-        view.setOnClickListener(l);
+        if(view != null) {
+            if(l != null) {
+                view.setOnClickListener(l);
+            }else {
+                view.setClickable(false);
+            }
+        }
         return this;
     }
 
@@ -160,18 +255,6 @@ public class RecyclerHolder extends RecyclerView.ViewHolder {
         this.itemView.setOnLongClickListener(l);
         return this;
     }
-
-    //    /**
-    //     * 为ImageView设置图片
-    //     *
-    //     * @param viewId
-    //     * @param url
-    //     * @return
-    //     */
-    //    public RecyclerHolder setImageByUrl(int viewId, String url) {
-    //      return this;
-    //    }
-
 
     public String getTag(){
         return tag;

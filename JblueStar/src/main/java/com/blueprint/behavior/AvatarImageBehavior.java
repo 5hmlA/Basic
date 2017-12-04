@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import static com.blueprint.helper.StatusBarHelper.getStatusBarHeight;
+
 
 /**
  * 图片控件位置动画
@@ -126,16 +128,5 @@ public class AvatarImageBehavior extends CoordinatorLayout.Behavior<ImageView> {
         // Toolbar的起始位置
         if (mStartToolbarPosition == 0)
             mStartToolbarPosition = dependency.getY() + (dependency.getHeight() / 2);
-    }
-
-    // 获取状态栏高度
-    public int getStatusBarHeight() {
-        int result = 0;
-        int resourceId = mContext.getResources().getIdentifier("status_bar_height", "dimen", "android");
-
-        if (resourceId > 0) {
-            result = mContext.getResources().getDimensionPixelSize(resourceId);
-        }
-        return result;
     }
 }

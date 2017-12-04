@@ -7,16 +7,16 @@ import com.blueprint.LibApp;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Map;
 
 /**
- *  sharedPreferences工具类
+ * sharedPreferences工具类
+ *
  * @author jiangzuyun.
- * @see  [put，get]
+ * @see [put，get]
  * @since [产品/模版版本]
  */
 public class SpHelper {
@@ -84,7 +84,6 @@ public class SpHelper {
         }else {
             editor.putString(key, object.toString());
         }
-
         SharedPreferencesCompat.apply(editor);
     }
 
@@ -112,6 +111,7 @@ public class SpHelper {
         }
         editor.commit();
     }
+
     /**
      * 将 键值 写入sp文件
      *
@@ -186,6 +186,7 @@ public class SpHelper {
     /**
      * 移除某个key值已经对应的值
      * MODE_PRIVATE
+     *
      * @param key
      */
     public static void sremove(String key){
@@ -209,7 +210,6 @@ public class SpHelper {
 
     /**
      * 清除所有数据
-     *
      */
     public static void sclear(){
         SharedPreferences sp = LibApp.getContext().getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
@@ -217,9 +217,9 @@ public class SpHelper {
         editor.clear();
         SharedPreferencesCompat.apply(editor);
     }
-  /**
+
+    /**
      * 清除所有数据
-     *
      */
     public void clear(){
         editor.clear();
@@ -236,7 +236,8 @@ public class SpHelper {
         SharedPreferences sp = LibApp.getContext().getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         return sp.contains(key);
     }
-/**
+
+    /**
      * 查询某个key是否已经存在
      *
      * @param key
@@ -255,7 +256,8 @@ public class SpHelper {
         SharedPreferences sp = LibApp.getContext().getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         return sp.getAll();
     }
-  /**
+
+    /**
      * 返回所有的键值对
      *
      * @return
@@ -282,7 +284,7 @@ public class SpHelper {
             try {
                 Class clz = SharedPreferences.Editor.class;
                 return clz.getMethod("apply");
-            }catch( NoSuchMethodException e ) {
+            }catch(NoSuchMethodException e) {
             }
 
             return null;
@@ -295,23 +297,26 @@ public class SpHelper {
          */
         public static void apply(SharedPreferences.Editor editor){
             try {
-                if(sApplyMethod != null) {
-                    sApplyMethod.invoke(editor);
-                    return;
-                }
-            }catch( IllegalArgumentException e ) {
-            }catch( IllegalAccessException e ) {
-            }catch( InvocationTargetException e ) {
+                //                if(sApplyMethod != null) {
+                //                    sApplyMethod.invoke(editor);
+                //                    return;
+                //                }
+                editor.apply();
+            }catch(Exception e) {
+                editor.commit();
             }
-            editor.commit();
         }
     }
 
     /**
      * 保存 集合
-     * @param name  键
-     * @param list  值
-     * @param <T> 可以是任意数据类型 包括对象
+     *
+     * @param name
+     *         键
+     * @param list
+     *         值
+     * @param <T>
+     *         可以是任意数据类型 包括对象
      */
     public <T> void saveObList(String name, ArrayList<T> list){
         Gson gson = new Gson();
@@ -322,14 +327,15 @@ public class SpHelper {
 
     /**
      * 获取保存的 list 集合
+     *
      * @param name
-     * @param <T> 可以是任意数据类型 包括对象
+     * @param <T>
+     *         可以是任意数据类型 包括对象
      * @return
      */
     public <T> ArrayList<T> getObList(String name){
         String args = msp.getString(name, "");
-        Type type = new TypeToken<ArrayList<T>>() {
-        }.getType();
+        Type type = new TypeToken<ArrayList<T>>() {}.getType();
         Gson gson = new Gson();
         ArrayList<T> list = gson.fromJson(args, type);
         if(list == null) {

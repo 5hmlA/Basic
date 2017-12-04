@@ -2,8 +2,10 @@ package com.blueprint.helper;
 
 import android.app.Activity;
 import android.content.Context;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 
 import com.blueprint.LibApp;
 
@@ -23,13 +25,14 @@ public final class KeyboardHelper {
      *
      * @param view
      */
-    public static void showKeyboard(View view){
+    public static void showKeyboard(EditText view){
         if(view != null) {
             view.requestFocus();
-        }
-        InputMethodManager imm = (InputMethodManager)view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        if(imm != null) {
-            imm.showSoftInput(view, 0);
+            InputMethodManager imm = (InputMethodManager)view.getContext()
+                    .getSystemService(Context.INPUT_METHOD_SERVICE);
+            if(imm != null) {
+                imm.showSoftInput(view, 0);
+            }
         }
     }
 
@@ -63,8 +66,34 @@ public final class KeyboardHelper {
             }
         }
     }
+
     public static boolean isKeyBoardActive(View view){
         InputMethodManager imm = (InputMethodManager)view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         return imm.isActive();//isOpen若返回true，则表示输入法打开
+    }
+
+    /**
+     * 模拟 键盘 删除按键
+     *
+     * @param editText
+     */
+    public static void execKeyDel(EditText editText){
+        execKeyEvent(editText, KeyEvent.KEYCODE_DEL);
+    }
+
+    /**
+     * 模拟执行 键盘 按键
+     *
+     * @param editText
+     * @param keyCode
+     *         </p><p>Refer to {@link KeyEvent}
+     */
+    public static void execKeyEvent(EditText editText, int keyCode){
+        if(editText != null) {
+            KeyEvent keyEventDown = new KeyEvent(KeyEvent.ACTION_DOWN, keyCode);
+            KeyEvent keyEventUp = new KeyEvent(KeyEvent.ACTION_UP, keyCode);
+            editText.onKeyDown(keyCode, keyEventDown);
+            editText.onKeyUp(keyCode, keyEventUp);
+        }
     }
 }

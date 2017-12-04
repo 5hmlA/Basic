@@ -4,6 +4,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 
+import com.blueprint.helper.interf.DragSwipeAdapter;
+
 
 public class DragSwipeCallback extends ItemTouchHelper.Callback {
 
@@ -75,7 +77,12 @@ public class DragSwipeCallback extends ItemTouchHelper.Callback {
      * @param actionState
      */
     @Override
-    public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
+    public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState){
+        if (viewHolder instanceof RecyclerHolder) {
+            if (RecyclerHolder.TAG_LOADING.equals(((RecyclerHolder) viewHolder).getTag())) {
+                return;
+            }
+        }
         mAdapter.onSelectedChanged(viewHolder, actionState);
         super.onSelectedChanged(viewHolder, actionState);
     }

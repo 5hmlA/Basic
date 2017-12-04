@@ -3,6 +3,8 @@ package com.blueprint.rx;
 import android.support.annotation.NonNull;
 import android.support.v4.util.SparseArrayCompat;
 
+import java.util.concurrent.TimeUnit;
+
 import io.reactivex.Flowable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -34,6 +36,9 @@ public class RxBus {
     }
 
     public void post(@NonNull Object obj){
+         mBus.onNext(obj);
+    }
+    public void postDelay(@NonNull Object obj){
          mBus.onNext(obj);
     }
 

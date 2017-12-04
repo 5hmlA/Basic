@@ -13,6 +13,7 @@ import android.widget.RelativeLayout;
  * @date 2017/6/7
  * @Description: 支持上下滑动的布局
  * @Others:
+  * <p><a href="https://github.com/ZuYun">github</a>
  */
 public class SlideDownLayout extends RelativeLayout {
 

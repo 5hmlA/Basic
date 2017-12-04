@@ -1,5 +1,6 @@
 package com.blueprint.basic;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,19 @@ public abstract class LazyFragment extends Fragment {
     protected boolean mIsViewCreated;
     protected boolean mIsVisibleToUser;
     protected boolean mIsFirstVisibile = true;
+    protected Context mContext;
+
+    @Override
+    public void onAttach(Context context){
+        mContext = context;
+        super.onAttach(context);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+
+    }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState){

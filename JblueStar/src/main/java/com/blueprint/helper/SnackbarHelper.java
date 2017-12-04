@@ -40,6 +40,10 @@ public class SnackbarHelper {
         return this;
     }
 
+    public Snackbar.SnackbarLayout getSnackbarLayout(){
+        return mSnackbarLayout;
+    }
+
     public TextView getMessageView() {
         return mMessageView;
     }

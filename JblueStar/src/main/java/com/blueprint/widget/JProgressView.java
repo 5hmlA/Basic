@@ -13,6 +13,7 @@ import android.view.View;
 /**
  * @another 江祖赟
  * @date 2017/6/22.
+ * <p><a href="https://github.com/ZuYun">github</a>
  */
 public class JProgressView extends View {
 

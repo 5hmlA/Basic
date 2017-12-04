@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="cw_item_crash">#00000000</color>
+    <color name="cw_item_crash_selected">#5a000000</color>
+    <color name="cw_my_fault">#04f20c</color>
+    <color name="cw_trace_text">#FF6B68</color>
+    <color name="cw_windowBackground">#373636</color>
+
+
+    <string name="jonas_recyc_loading_more">加载更多</string>
+    <string name="jonas_recyc_load_retry">点击重试</string>
+    <string name="jdouble_exit">再按一次退出</string>
+    <string name="j_d_newversion">版本更新..</string>
+    <string name="jbase_comment_send">发送</string>
+    <string name="cw_action_download">下载</string>
+    <string name="cw_action_restart">重启</string>
+    <string name="cw_action_settings">设置</string>
+    <string name="cw_default_page_name" translatable="false">CrashWrapper</string>
+    <string name="cw_error_message">很不好意思! 应用除了点小问题. \n\n您可以点击 <b>下载</b> 来下载更稳定的新版本,或者点击重启来重启应用</string>
+    <string name="cw_error_title">警报</string>
+    <string name="cw_hello_woodpecker" translatable="false">干掉个程序员祭天把!</string>
+    <string name="cw_share">分享LOG...</string>
+    <string name="layout_basestate_retry">重试</string>
+
+
+    <style name="Base.Theme.Pecker" parent="android:Theme.Black"/>
+    <style name="CWLineTextAppearance">
+        <item name="android:textColor">@color/cw_my_fault</item>
+    </style>
+    <style name="Theme.crashwraper" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:background">@color/cw_windowBackground</item>
+    </style>
+    <style name="Theme.crashwraper.Dialog" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item>　
+    </style>
+</resources>

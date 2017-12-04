@@ -1,7 +1,6 @@
 package com.blueprint.http;
 
-import android.util.Log;
-
+import com.blueprint.LibApp;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -13,18 +12,17 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static com.blueprint.helper.LogHelper.Log_e;
+import static com.blueprint.helper.LogHelper.slog_e;
 
 public class ServiceFactory {
+    private static final String TAG = "ServiceFactory";
 
     private final Gson mGson;
     private OkHttpClient mOkHttpClient;
 
-
     private ServiceFactory(){
         mGson = new GsonBuilder().setDateFormat("yyyy-MM-dd hh:mm:ss").create();
         mOkHttpClient = OkHttpProvider.getDefaultOkHttpClient();
-
     }
 
     private static class SingletonHolder {
@@ -40,6 +38,7 @@ public class ServiceFactory {
         factory.mOkHttpClient = OkHttpProvider.getNetOkHttpClient();
         return factory;
     }
+
     public static ServiceFactory getCacheInstance(){
         ServiceFactory factory = SingletonHolder.INSTANCE;
         factory.mOkHttpClient = OkHttpProvider.getCacheOkHttpClient();
@@ -63,14 +62,12 @@ public class ServiceFactory {
     }
 
     public <S> S createService(Class<S> serviceClass){
-        String baseUrl = "";
+        String baseUrl = LibApp.getBaseUrl();
         try {
             Field field1 = serviceClass.getField("BASE_URL");
             baseUrl = (String)field1.get(serviceClass);
-        }catch(NoSuchFieldException e) {
-            Log_e(Log.getStackTraceString(e));
-        }catch(IllegalAccessException e) {
-            Log_e(Log.getStackTraceString(e));
+        }catch(Exception e) {
+            slog_e(TAG, "Service接口中没有自定义 BASE_URL字段 ");
         }
         return createService(serviceClass, baseUrl);
     }

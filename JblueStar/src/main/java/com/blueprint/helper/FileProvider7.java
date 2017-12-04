@@ -60,9 +60,9 @@ public class FileProvider7 {
         }
     }
 
-    public static void setIntentDataAndType(Intent intent, String type, File file){
-        setIntentDataAndType(intent, type, file);
-    }
+//    public static void setIntentDataAndType(Intent intent, String type, File file){
+//        setIntentDataAndType(intent, type, file);
+//    }
 
     public static void setIntentDataAndType(Intent intent, String type, File file, boolean writeAble){
         if(Build.VERSION.SDK_INT>=24) {

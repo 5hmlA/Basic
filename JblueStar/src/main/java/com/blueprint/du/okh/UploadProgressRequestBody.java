@@ -16,6 +16,7 @@ import okio.Sink;
  * http://blog.csdn.net/sbsujjbcy/article/details/48194701
  */
 public class UploadProgressRequestBody extends RequestBody {
+    private String mUrl;
     //实际请求体
     private RequestBody mRequestBody;
     private ProgressListener mUploadListener;
@@ -23,7 +24,8 @@ public class UploadProgressRequestBody extends RequestBody {
     private BufferedSink bufferedSink;
     private long mContentLength;
 
-    public UploadProgressRequestBody(RequestBody requestBody, ProgressListener uploadListener){
+    public UploadProgressRequestBody(String url,RequestBody requestBody, ProgressListener uploadListener){
+        mUrl = url;
         mRequestBody = requestBody;
         mUploadListener = uploadListener;
     }
@@ -79,7 +81,7 @@ public class UploadProgressRequestBody extends RequestBody {
                 bytesWritten += byteCount;
                 //回调
                 if(mUploadListener != null) {
-                    mUploadListener.onProgress(bytesWritten, mContentLength, bytesWritten == mContentLength);
+                    mUploadListener.onProgress(bytesWritten, mContentLength, bytesWritten == mContentLength,mUrl);
                 }
             }
         };

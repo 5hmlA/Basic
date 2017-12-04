@@ -9,6 +9,20 @@ import android.util.SparseArray;
  * @des [一句话描述]
  */
 public abstract class BaseFrgmtFractory {
-    protected SparseArray<Fragment> fmCache = new SparseArray<Fragment>();
-    public abstract Fragment createFragment(int position);
+    public SparseArray<Fragment> fmCache = new SparseArray<Fragment>();
+
+    {
+        initFrgment();
+    }
+
+    protected void initFrgment(){
+    }
+
+    public Fragment createFragment(int position){
+        return fmCache.get(position);
+    }
+
+    public void removeFragment(int position){
+        fmCache.remove(position);
+    }
 }

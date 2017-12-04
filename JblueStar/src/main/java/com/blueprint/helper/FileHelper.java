@@ -1,15 +1,16 @@
 package com.blueprint.helper;
 
-import android.content.Context;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 
 import com.blueprint.LibApp;
 import com.blueprint.rx.RxUtill;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,7 +19,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.channels.FileChannel;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Single;
 import io.reactivex.SingleEmitter;
 import io.reactivex.SingleOnSubscribe;
@@ -33,19 +38,42 @@ import static com.blueprint.helper.LogHelper.slog_d;
  */
 public class FileHelper {
 
-    private static String TAG = "FileUtils";
+    private static String TAG = "FileHelper";
     private static String FILE_WRITING_ENCODING = "UTF-8";
     private static String FILE_READING_ENCODING = "UTF-8";
 
-    public static void closeQuietly(Closeable closeable) {
-        if (closeable != null) {
-            try {
-                closeable.close();
-            } catch (RuntimeException rethrown) {
-                throw rethrown;
-            } catch (Exception ignored) {
+    public static void closeQuietly(Closeable closeable){
+        closeIO(closeable);
+    }
+
+
+    public static void closeIO(Closeable... closes){
+        for(Closeable close : closes) {
+            if(close != null) {
+                try {
+                    close.close();
+                }catch(IOException e) {
+                    e.printStackTrace();
+                    close = null;
+                }
             }
         }
+    }
+
+    public static String readTextfromAsset(String fileName){
+        try {
+            InputStream inStream = LibApp.getContext().getAssets().open(fileName);
+            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            byte[] bytes = new byte[1024];
+            int len = 0;
+            while ((len = inStream.read(bytes)) > 0) {
+                outStream.write(bytes, 0, len);
+            }
+            return outStream.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static String readFile(String _sFileName, String _sEncoding) throws Exception{
@@ -247,23 +275,6 @@ public class FileHelper {
         return cacheDir;
     }
 
-    /**
-     * 得到皮肤目录
-     *
-     * @return
-     */
-    public static File getSkinDir(){
-        File skinDir = new File(getCacheDir(), "skin");
-        if(skinDir.exists()) {
-            skinDir.mkdirs();
-        }
-        return skinDir;
-    }
-
-    public static String getSkinDirPath(Context context){
-        return getSkinDir().getAbsolutePath();
-    }
-
     public static String getSaveImagePath(){
 
         String path = getCacheDir().getAbsolutePath();
@@ -289,11 +300,15 @@ public class FileHelper {
         return path.substring(index+1);
     }
 
-    public static Single<Boolean> clearFile(final File file){
+    public static Single<Boolean> clearFile(final File... file){
         return Single.create(new SingleOnSubscribe<Boolean>() {
             @Override
             public void subscribe(@NonNull SingleEmitter<Boolean> e) throws Exception{
-                doClearFile(file);
+                for(File file1 : file) {
+                    if(file1 != null) {
+                        doClearFile(file1);
+                    }
+                }
                 e.onSuccess(true);
             }
         }).compose(RxUtill.<Boolean>defaultSchedulers_single());
@@ -313,11 +328,17 @@ public class FileHelper {
         }
     }
 
-    public static Single<Long> getDirSize(final File dir){
+    public static Single<Long> getDirSize(final File... dir){
         return Single.create(new SingleOnSubscribe<Long>() {
             @Override
             public void subscribe(@NonNull SingleEmitter<Long> e) throws Exception{
-                e.onSuccess(calcureDirSize(dir));
+                long size = 0;
+                for(File file : dir) {
+                    if(file != null) {
+                        size += calcureDirSize(file);
+                    }
+                }
+                e.onSuccess(size);
             }
         }).compose(RxUtill.<Long>defaultSchedulers_single());
     }
@@ -410,23 +431,22 @@ public class FileHelper {
 
     //Android/data/包名/file/download/filename
     public static String getFileDownloadPath(String fileName){
-        return new File(LibApp.getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileName)
-                .getAbsolutePath();
+        return new File(LibApp.getAppFileDir(Environment.DIRECTORY_DOWNLOADS), fileName).getAbsolutePath();
     }
 
     //Android/data/包名/file/download/filename
     public static String getFileDownloadPath(String dir, String fileName){
-        return new File(LibApp.getContext().getExternalFilesDir(dir), fileName).getAbsolutePath();
+        return new File(LibApp.getAppFileDir(dir), fileName).getAbsolutePath();
     }
 
     //Android/data/包名/file/download/filename
     public static File getFileDownloadPath_file(String fileName){
-        return new File(LibApp.getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileName);
+        return new File(LibApp.getAppFileDir(Environment.DIRECTORY_DOWNLOADS), fileName);
     }
 
     @NonNull
     public static String getNewAppName(String new_version){
-        return LibApp.getPackageName()+new_version+".apk";
+        return LibApp.getPackageName()+"_"+new_version+".apk";
     }
 
     @NonNull
@@ -434,6 +454,308 @@ public class FileHelper {
         return getFileDownloadPath_file(getNewAppName(new_version));
     }
 
-    //todo  移动复制
+    /**
+     * 复制或移动目录
+     *
+     * @param srcDirPath
+     *         源目录路径
+     * @param destDirPath
+     *         目标目录路径
+     * @param isMove
+     *         是否移动
+     * @return {@code true}: 复制或移动成功<br>{@code false}: 复制或移动失败
+     */
+    public static boolean copyOrMoveDir(final String srcDirPath, final String destDirPath, final boolean isMove){
+        return copyOrMoveDir(new File(srcDirPath), new File(destDirPath), isMove);
+    }
 
+    /**
+     * 复制或移动目录
+     *
+     * @param srcDir
+     *         源目录
+     * @param destDir
+     *         目标目录
+     * @param isMove
+     *         是否移动
+     * @return {@code true}: 复制或移动成功<br>{@code false}: 复制或移动失败
+     */
+    public static boolean copyOrMoveDir(final File srcDir, final File destDir, final boolean isMove){
+        if(srcDir == null || destDir == null) {
+            return false;
+        }
+        // 如果目标目录在源目录中则返回false，看不懂的话好好想想递归怎么结束
+        // srcPath : F:\\MyGithub\\AndroidUtilCode\\utilcode\\src\\test\\res
+        // destPath: F:\\MyGithub\\AndroidUtilCode\\utilcode\\src\\test\\res1
+        // 为防止以上这种情况出现出现误判，须分别在后面加个路径分隔符
+        String srcPath = srcDir.getPath()+File.separator;
+        String destPath = destDir.getPath()+File.separator;
+        if(destPath.contains(srcPath)) {
+            return false;
+        }
+        // 源文件不存在或者不是目录则返回false
+        if(!srcDir.exists() || !srcDir.isDirectory()) {
+            return false;
+        }
+        // 目标目录不存在返回false
+        if(!destDir.mkdir()) {
+            return false;
+        }
+        File[] files = srcDir.listFiles();
+        for(File file : files) {
+            File oneDestFile = new File(destPath+file.getName());
+            if(file.isFile()) {
+                // 如果操作失败返回false
+                if(!copyOrMoveFile2(file, oneDestFile, isMove)) {
+                    return false;
+                }
+            }else if(file.isDirectory()) {
+                // 如果操作失败返回false
+                if(!copyOrMoveDir(file, oneDestFile, isMove)) {
+                    return false;
+                }
+            }
+        }
+        doClearFile(srcDir);
+        return !isMove;
+    }
+
+    /**
+     * 复制或移动文件
+     *
+     * @param srcFilePath
+     *         源文件路径
+     * @param destFilePath
+     *         目标文件路径
+     * @param isMove
+     *         是否移动
+     * @return {@code true}: 复制或移动成功<br>{@code false}: 复制或移动失败
+     */
+    public static Observable<Boolean> copyOrMoveFile(final String srcFilePath, final String destFilePath, final boolean
+            isMove){
+        return copyOrMoveFile(new File(srcFilePath), new File(destFilePath), isMove);
+    }
+
+    /**
+     * 复制或移动文件
+     *
+     * @param srcFile
+     *         源文件
+     * @param destFile
+     *         目标文件
+     * @param isMove
+     *         是否移动
+     * @return {@code true}: 复制或移动成功<br>{@code false}: 复制或移动失败
+     */
+    private static Observable<Boolean> copyOrMoveFile(final File srcFile, final File destFile, final boolean isMove){
+        return Observable.<Boolean>create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(ObservableEmitter<Boolean> emitter){
+                if(!srcFile.exists()) {
+                    emitter.onNext(false);
+                    emitter.onComplete();
+                }
+                if(destFile.exists()) {
+                    emitter.onNext(true);
+                    emitter.onComplete();
+                }
+                FileChannel sourceChannel = null;
+                FileChannel destChannel = null;
+                try {
+                    sourceChannel = new FileInputStream(srcFile).getChannel();
+                    destChannel = new FileOutputStream(destFile).getChannel();
+                    destChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
+                    if(isMove) {
+                        srcFile.delete();
+                    }
+                    emitter.onNext(true);
+                    emitter.onComplete();
+                }catch(IOException e) {
+                    e.printStackTrace();
+                    emitter.onNext(false);
+                    emitter.onComplete();
+                }finally {
+                    if(sourceChannel != null) {
+                        try {
+                            sourceChannel.close();
+                        }catch(IOException e) {
+                            e.printStackTrace();
+                            emitter.onNext(false);
+                            emitter.onComplete();
+                        }
+                    }
+                    if(destChannel != null) {
+                        try {
+                            destChannel.close();
+                        }catch(IOException e) {
+                            e.printStackTrace();
+                            emitter.onNext(false);
+                            emitter.onComplete();
+                        }
+                    }
+                }
+            }
+        }).compose(RxUtill.<Boolean>defaultSchedulers_obser());
+    }
+
+    /**
+     * 复制或移动文件
+     *
+     * @param srcFile
+     *         源文件
+     * @param destFile
+     *         目标文件
+     * @param isMove
+     *         是否移动
+     * @return {@code true}: 复制或移动成功<br>{@code false}: 复制或移动失败
+     */
+    private static boolean copyOrMoveFile2(final File srcFile, final File destFile, final boolean isMove){
+        if(!srcFile.exists()) {
+            return false;
+        }
+        if(destFile.exists()) {
+            return true;
+        }
+        FileChannel sourceChannel = null;
+        FileChannel destChannel = null;
+        try {
+            sourceChannel = new FileInputStream(srcFile).getChannel();
+            destChannel = new FileOutputStream(destFile).getChannel();
+            destChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
+            if(isMove) {
+                srcFile.delete();
+            }
+        }catch(IOException e) {
+            e.printStackTrace();
+            return false;
+        }finally {
+            if(sourceChannel != null) {
+                try {
+                    sourceChannel.close();
+                }catch(IOException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+            if(destChannel != null) {
+                try {
+                    destChannel.close();
+                }catch(IOException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+
+    /**
+     * 复制目录
+     *
+     * @param srcDirPath
+     *         源目录路径
+     * @param destDirPath
+     *         目标目录路径
+     * @return {@code true}: 复制成功<br>{@code false}: 复制失败
+     */
+    public static boolean copyDir(final String srcDirPath, final String destDirPath){
+        return copyDir(new File(srcDirPath), new File(destDirPath));
+    }
+
+    /**
+     * 复制目录
+     *
+     * @param srcDir
+     *         源目录
+     * @param destDir
+     *         目标目录
+     * @return {@code true}: 复制成功<br>{@code false}: 复制失败
+     */
+    public static boolean copyDir(final File srcDir, final File destDir){
+        return copyOrMoveDir(srcDir, destDir, false);
+    }
+
+    /**
+     * 复制文件
+     *
+     * @param srcFilePath
+     *         源文件路径
+     * @param destFilePath
+     *         目标文件路径
+     * @return {@code true}: 复制成功<br>{@code false}: 复制失败
+     */
+    public static Observable copyFile(final String srcFilePath, final String destFilePath){
+        return copyFile(new File(srcFilePath), new File(destFilePath));
+    }
+
+    /**
+     * 复制文件
+     *
+     * @param srcFile
+     *         源文件
+     * @param destFile
+     *         目标文件
+     * @return {@code true}: 复制成功<br>{@code false}: 复制失败
+     */
+    public static Observable<Boolean> copyFile(final File srcFile, final File destFile){
+        return copyOrMoveFile(srcFile, destFile, false);
+    }
+
+    /**
+     * 移动目录
+     *
+     * @param srcDirPath
+     *         源目录路径
+     * @param destDirPath
+     *         目标目录路径
+     * @return {@code true}: 移动成功<br>{@code false}: 移动失败
+     */
+    public static boolean moveDir(final String srcDirPath, final String destDirPath){
+        return moveDir(new File(srcDirPath), new File(destDirPath));
+    }
+
+    /**
+     * 移动目录
+     *
+     * @param srcDir
+     *         源目录
+     * @param destDir
+     *         目标目录
+     * @return {@code true}: 移动成功<br>{@code false}: 移动失败
+     */
+    public static boolean moveDir(final File srcDir, final File destDir){
+        return copyOrMoveDir(srcDir, destDir, true);
+    }
+
+    /**
+     * 移动文件
+     *
+     * @param srcFilePath
+     *         源文件路径
+     * @param destFilePath
+     *         目标文件路径
+     * @return {@code true}: 移动成功<br>{@code false}: 移动失败
+     */
+    public static Observable<Boolean> moveFile(final String srcFilePath, final String destFilePath){
+        return moveFile(new File(srcFilePath), new File(destFilePath));
+    }
+
+    /**
+     * 移动文件
+     *
+     * @param srcFile
+     *         源文件
+     * @param destFile
+     *         目标文件
+     * @return {@code true}: 移动成功<br>{@code false}: 移动失败
+     */
+    public static Observable<Boolean> moveFile(final File srcFile, final File destFile){
+        return copyOrMoveFile(srcFile, destFile, true);
+    }
+
+    public static String getMimeType(String fileUrl) {
+        String extension = MimeTypeMap.getFileExtensionFromUrl(fileUrl);
+        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+    }
 }

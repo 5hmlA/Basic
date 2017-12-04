@@ -30,22 +30,19 @@ import okhttp3.Response;
 public class UploadProgressInterceptor implements Interceptor {
     private ProgressListener mUploadListener;
 
-    public UploadProgressInterceptor(ProgressListener uploadListener) {
+    public UploadProgressInterceptor(ProgressListener uploadListener){
         mUploadListener = uploadListener;
     }
 
     @Override
-    public Response intercept(Chain chain) throws IOException {
+    public Response intercept(Chain chain) throws IOException{
         Request request = chain.request();
-        if(null == request.body()){
+        if(null == request.body()) {
             return chain.proceed(request);
         }
 
-        Request build = request.newBuilder()
-                .method(request.method(),
-                        new UploadProgressRequestBody(request.body(),
-                        mUploadListener))
-                .build();
+        Request build = request.newBuilder().method(request.method(),
+                new UploadProgressRequestBody(request.url().toString(), request.body(), mUploadListener)).build();
         return chain.proceed(build);
     }
 }

@@ -22,8 +22,11 @@ package com.blueprint.du.okh;
  * @date 2017/6/14.
  */
 public interface ProgressListener {
-    void onProgress(long bytesWritten, long contentLength,boolean done);
-    void onComplete();
-    void onFailure();
-    void onCancel();
+    void onProgress(long bytesWritten, long contentLength, boolean done, Object tag);
+
+    public void onComplete();
+
+    public void onFailure();
+
+    public void onCancel();
 }

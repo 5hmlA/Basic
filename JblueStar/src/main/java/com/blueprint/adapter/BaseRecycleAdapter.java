@@ -8,18 +8,29 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.blueprint.helper.interf.IRecvData;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @des [recycleview适配器 基类,支持多种布局]
  */
-public abstract class BaseRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerHolder> {
+public class BaseRecycleAdapter<T extends IRecvData> extends RecyclerView.Adapter<RecyclerHolder> {
 
     private final static String TAG = BaseRecycleAdapter.class.getSimpleName();
     private SparseArray<Integer> mItemLayoutIds = new SparseArray<>();
     private List<T> mData = new ArrayList<>();
 
+    /**
+     * <p>需要重写{@link #getItemViewType(int)} </p>
+     * @param itemLayoutId <p color="white">数组下标 作为item类型</p>
+     */
+    public BaseRecycleAdapter(int... itemLayoutId) {
+        for (int i = 0; i < itemLayoutId.length; i++) {
+            mItemLayoutIds.append(i, itemLayoutId[i]);
+        }
+    }
     /**
      * <p>需要重写{@link #getItemViewType(int)} </p>
      * @param data
@@ -68,16 +79,24 @@ public abstract class BaseRecycleAdapter<T> extends RecyclerView.Adapter<Recycle
     @Override
     public RecyclerHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View root = inflater.inflate(getItemTypeLayout(viewType), parent, false);
+        View root = inflater.inflate(getItemTypeLayout(viewType), parent, false);//item布局最外层设置的高有效
+//        View root = inflater.inflate(getItemTypeLayout(viewType), null); //item布局最外层设置的高无效
         return new RecyclerHolder(root);
     }
 
     @Override
     public void onBindViewHolder(RecyclerHolder holder, int position) {
+        mData.get(position).bindHolder(holder, null, null);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+
+            }
+        });
         convert(holder, position, mData.get(position));
     }
 
-    public abstract void convert(RecyclerHolder holder, int position, T itemData);
+    public void convert(RecyclerHolder holder, int position, T itemData){}
 
     @Override
     public int getItemCount() {

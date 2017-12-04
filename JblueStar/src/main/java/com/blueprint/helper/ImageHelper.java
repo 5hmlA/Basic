@@ -5,8 +5,13 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Environment;
+import android.util.Log;
+import android.widget.ImageView;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -219,6 +224,23 @@ public class ImageHelper {
         Matrix matrix = new Matrix();
         matrix.postScale(scaleWidth, scaleHeight);
         return Bitmap.createBitmap(org, 0, 0, org.getWidth(), org.getHeight(), matrix, true);
+    }
+
+
+    public static void saveImage(ImageView imageView){
+        Drawable drawable = imageView.getDrawable();
+        Bitmap saveBitmap = imageView.getDrawingCache();
+        File imagesFolder = new File(Environment.getExternalStorageDirectory(), "ImagesFolder");
+        File file = new File(imagesFolder, "image.jpg");
+        String fileName = file.getAbsolutePath();
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            saveBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            out.flush();
+            out.close();
+        } catch (Exception e) {
+            Log.e("Image", "Convert");
+        }
     }
 
 }

@@ -55,7 +55,7 @@ public class OkHttpProvider {
         httpClientBuilder.retryOnConnectionFailure(true);
         httpClientBuilder.readTimeout(DEFAULT_READ_TIMEOUT, TimeUnit.SECONDS);
         //设置缓存
-        File httpCacheDirectory = new File(LibApp.getContext().getCacheDir(), OKHTTPCACHE);
+        File httpCacheDirectory = new File(LibApp.getCacheDir(), OKHTTPCACHE);
         httpClientBuilder.cache(new Cache(httpCacheDirectory, 100*1024*30));
         //设置拦截器
         httpClientBuilder.addInterceptor(new UserAgentInterceptor("Android Device"));
@@ -72,9 +72,29 @@ public class OkHttpProvider {
             httpClientBuilder.addInterceptor(netInterceptor);
         }
         httpClientBuilder.addNetworkInterceptor(new NetDataSaveInterceptor());
+
+        if(LibApp.isInDebug()) {
+            httpClientBuilder.addInterceptor(new LoggingInterceptor());
+        }
+
+//        httpClientBuilder.cookieJar(new CookieJar() {
+//            @Override
+//            public void saveFromResponse(HttpUrl url, List<Cookie> cookies){
+//
+//            }
+//
+//            @Override
+//            public List<Cookie> loadForRequest(HttpUrl url){
+//                return null;
+//            }
+//        });
         return httpClientBuilder.build();
     }
 
+    /**
+     *  添加请求头 拦截器
+      * @param interceptors
+     */
     public static void fixedInterceptors(Interceptor... interceptors){
         sInterceptors.clear();
         sInterceptors.addAll(Arrays.asList(interceptors));
@@ -107,7 +127,6 @@ public class OkHttpProvider {
                 }
                 response = response.newBuilder().removeHeader("Pragma").header("Cache-Control", cacheControl).build();
             }else {
-
                 int maxStale = 60*60*24*30;
                 response = response.newBuilder().removeHeader("Pragma")
                         .header("Cache-Control", "public, only-if-cached, max-stale="+maxStale).build();
@@ -129,7 +148,7 @@ public class OkHttpProvider {
     }
 
     /**
-     * 强制从网络获取数据
+     * 强制从本地获取数据
      */
     private static class FromCacheInterceptor implements Interceptor {
         @Override
@@ -194,4 +213,35 @@ public class OkHttpProvider {
             return response.newBuilder().body(okhttp3.ResponseBody.create(mediaType, content)).build();
         }
     }
+
+    private final static Interceptor REWRITE_RESPONSE_INTERCEPTOR = new Interceptor() {
+        @Override
+        public okhttp3.Response intercept(Chain chain) throws IOException {
+            okhttp3.Response originalResponse = chain.proceed(chain.request());
+            String cacheControl = originalResponse.header("Cache-Control");
+            if (cacheControl == null || cacheControl.contains("no-store") || cacheControl.contains("no-cache") ||
+                    cacheControl.contains("must-revalidate") || cacheControl.contains("max-age=0")) {
+                return originalResponse.newBuilder()
+                        .removeHeader("Pragma")
+                        .header("Cache-Control", "public, max-age=" + 5000)
+                        .build();
+            } else {
+                return originalResponse;
+            }
+        }
+    };
+
+//    private final static Interceptor REWRITE_RESPONSE_INTERCEPTOR_OFFLINE = new Interceptor() {
+//        @Override
+//        public okhttp3.Response intercept(Chain chain) throws IOException {
+//            Request request = chain.request();
+//            if (!isConnected()) {
+//                request = request.newBuilder()
+//                        .removeHeader("Pragma")
+//                        .header("Cache-Control", "public, only-if-cached")
+//                        .build();
+//            }
+//            return chain.proceed(request);
+//        }
+//    };
 }

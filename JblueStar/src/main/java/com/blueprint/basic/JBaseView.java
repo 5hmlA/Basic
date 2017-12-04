@@ -7,12 +7,15 @@ import com.blueprint.Consistent;
  * @date 2017/6/6
  * @des [一句话描述]
  */
-public interface JBaseView<T> {
+public interface JBaseView<SD> {
 
     void showLoading();
 
-    void showError(Consistent.ErrorCode errorCode);
+    //todo 改成code+msg
+    void showError(@Consistent.ErrorCode int eCode);
 
-    void showSucceed(T data);
+    void showError(Consistent.ErrorData error);
+
+    void showSucceed(SD data);
 
 }

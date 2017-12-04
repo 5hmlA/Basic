@@ -46,6 +46,9 @@ public class DownloadCell {
     private Pair mPair;
     private ProgressListener mProgressListener;
 
+    public DownloadCell(String downUrl){
+        this.downUrl = downUrl;
+    }
 
     public DownloadCell(String downUrl, String savePath, String saveName, String downloadID, long fileSize, String extra1, String extra2, String extra3, String version, Pair pair, ProgressListener progressListener){
         this.downUrl = downUrl;

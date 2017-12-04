@@ -5,18 +5,28 @@ import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.os.Build;
+import android.support.v4.view.NestedScrollingChild;
+import android.support.v4.view.NestedScrollingChildHelper;
 import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.Interpolator;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import com.blueprint.LibApp;
+import com.blueprint.helper.CheckHelper;
 import com.blueprint.helper.DpHelper;
-import com.squareup.picasso.Picasso;
+import com.blueprint.helper.LogHelper;
+import com.blueprint.helper.PicHelper;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -32,10 +42,10 @@ import static com.blueprint.helper.LogHelper.slog_d;
  * @date 2017/6/7
  * @des [rxjava实现自动滚动轮播图，控件可见重启滾動，不可见关闭滚动]
  */
-public class LoopImagePager extends RelativeLayout {
+public class LoopImagePager extends RelativeLayout implements NestedScrollingChild {
     private static final String TAG = LoopImagePager.class.getSimpleName();
     private static final long LOOPINTERVAL = 2;
-    private ViewPager mViewPager;
+    private ViewPagerFixed mViewPager;
     private Disposable mSubscribe;
     private onLoopImageClickListener mL;
     private ImagePagerAdapter mAdapter;
@@ -44,6 +54,11 @@ public class LoopImagePager extends RelativeLayout {
     private PointF mLastMoved = new PointF();
     private int mCurrentPosition = 20;
     private ViewPager.PageTransformer mMzTransformer = new MzTransformer();
+    private boolean mAutoLoop = true;
+    private PagerAdapter mCustomAdapter;
+    private NestedScrollingChildHelper mChildHelper;
+    private List<String> mPagerData;
+    public int mImageRoundRaidus;
 
     public LoopImagePager(Context context){
         this(context, null);
@@ -56,12 +71,14 @@ public class LoopImagePager extends RelativeLayout {
     public LoopImagePager(Context context, AttributeSet attrs, int defStyleAttr){
         super(context, attrs, defStyleAttr);
         setWillNotDraw(false);
-        mViewPager = new ViewPager(context);
+        mViewPager = new ViewPagerFixed(context);
         setClipChildren(false);
-        LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-        layoutParams.leftMargin = (int)DpHelper.dp2px(20);
-        layoutParams.rightMargin = (int)DpHelper.dp2px(20);
-        mViewPager.setLayoutParams(layoutParams);
+        setClipToPadding(false);
+        setPadding((int)DpHelper.dp2px(20), getPaddingTop(), (int)DpHelper.dp2px(20), getPaddingBottom());
+        //        LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        //        layoutParams.leftMargin = (int)DpHelper.dp2px(20);
+        //        layoutParams.rightMargin = (int)DpHelper.dp2px(20);
+        //        mViewPager.setLayoutParams(layoutParams);
         addView(mViewPager);
 
         //        indicatorView = new IndicatorView(mContext);
@@ -75,17 +92,34 @@ public class LoopImagePager extends RelativeLayout {
         //        rlp.setMargins(0, 0, 20, 10);
         //        indicatorView.setLayoutParams(rlp);
 
+        setSliderTransformDuration(300, new DecelerateInterpolator());
+        mChildHelper = new NestedScrollingChildHelper(this);
+        mChildHelper.setNestedScrollingEnabled(true);
 
-        post(new Runnable() {
-            @Override
-            public void run(){
-                startLoop();
-            }
-        });
+        //        post(new Runnable() {
+        //            @Override
+        //            public void run(){
+        //                startLoop();
+        //            }
+        //        });
+    }
+
+    /**
+     * set the duration between two slider changes.
+     */
+    private void setSliderTransformDuration(int period, Interpolator interpolator){
+        try {
+            Field mScroller = ViewPager.class.getDeclaredField("mScroller");
+            mScroller.setAccessible(true);
+            FixedSpeedScroller scroller = new FixedSpeedScroller(mViewPager.getContext(), interpolator, period);
+            mScroller.set(mViewPager, scroller);
+        }catch(Exception e) {
+
+        }
     }
 
     private void startLoop(){
-        if(mAdapter == null || mAdapter.getCount()<=1) {
+        if(!mAutoLoop || mAdapter == null || mAdapter.getCount()<=1) {
             return;
         }
         if(mSubscribe == null || mSubscribe.isDisposed()) {
@@ -115,23 +149,47 @@ public class LoopImagePager extends RelativeLayout {
         }
     }
 
-    public LoopImagePager setPagerAdapter(ImagePagerAdapter pagerAdapter){
-        mAdapter = pagerAdapter;
+    public LoopImagePager setPagerAdapter(PagerAdapter pagerAdapter){
+        mCustomAdapter = pagerAdapter;
         return this;
     }
 
+    public LoopImagePager setPagerData(String[] pagerData, int currentPosition){
+        return setPagerData(Arrays.asList(pagerData), currentPosition);
+    }
+
+    public LoopImagePager setPagerData(List<String> pagerData, int currentPosition){
+        mCurrentPosition = currentPosition;
+        return setPagerData(pagerData);
+    }
+
+    public List<String> getPagerData(){
+        return mPagerData;
+    }
+
     public LoopImagePager setPagerData(List<String> pagerData){
+        mPagerData = pagerData;
+        if(!CheckHelper.checkLists(pagerData)) {
+            LogHelper.Log_e("LoopImagePager,setPagerData:pagerData null");
+            setVisibility(GONE);
+        }
         if(mMzTransformer != null) {
             mViewPager.setPageTransformer(true, mMzTransformer);
         }
-        if(mAdapter == null) {
+        if(mCustomAdapter == null) {
             mAdapter = new ImagePagerAdapter(pagerData);
+            if(mL != null) {
+                mAdapter.setOnitemClickListener(mL);
+            }
+            mViewPager.setAdapter(mAdapter);
+        }else {
+            mViewPager.setAdapter(mCustomAdapter);
         }
-        mViewPager.setAdapter(mAdapter);
         mCurrentPosition = pagerData.size()>1 ? mCurrentPosition : 0;
         mViewPager.setCurrentItem(mCurrentPosition);
-        if(mL != null) {
-            mAdapter.setOnitemClickListener(mL);
+        mViewPager.setOffscreenPageLimit(( 3 ));
+        if(mAutoLoop) {
+            startLoop();
         }
         return this;
     }
@@ -143,39 +201,136 @@ public class LoopImagePager extends RelativeLayout {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event){
-        if(mAdapter != null && mAdapter.getCount()>1) {
-            //在列表中 上下滚动事件传不到 但是能够接收少量move事件
-            //所以简单的down就停止不够，当上下滑动开启循环
-            switch(event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    mLastMoved.set(event.getX(), event.getY());
-                    mMove = false;
-                    stopLoop();
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    if(Math.abs(event.getX()-mLastMoved.x)<Math.abs(event.getY()-mLastMoved.y)) {
-                        //down的时候关了
-                        startLoop();
-                    }else {
-                        slog_d(TAG, "move");
-                        mMove = true;
+        try {
+            if(mAutoLoop && mAdapter != null && mAdapter.getCount()>1) {
+                //在列表中 上下滚动事件传不到 但是能够接收少量move事件
+                //所以简单的down就停止不够，当上下滑动开启循环
+                switch(event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        mLastMoved.set(event.getX(), event.getY());
+                        mMove = false;
                         stopLoop();
-                    }
-                    break;
-                case MotionEvent.ACTION_UP:
-                    slog_d(TAG, "up");
-                    mMove = false;
-                    startLoop();
-                    break;
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        if(Math.abs(event.getX()-mLastMoved.x)<Math.abs(event.getY()-mLastMoved.y)) {
+                            mChildHelper.stopNestedScroll();
+                            //down的时候关了
+                            startLoop();
+                        }else {
+                            mChildHelper.startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL);
+                            slog_d(TAG, "move");
+                            mMove = true;
+                            stopLoop();
+                        }
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        mChildHelper.stopNestedScroll();
+                        slog_d(TAG, "up");
+                        mMove = false;
+                        startLoop();
+                        break;
 
+                }
             }
+            return super.dispatchTouchEvent(event);
+        }catch(IllegalArgumentException ex) {
+            //            https://github.com/chrisbanes/PhotoView/issues/31
+            ex.printStackTrace();
+            return false;
         }
-        return super.dispatchTouchEvent(event);
     }
 
-    public static class ImagePagerAdapter extends PagerAdapter {
+    @Override
+    public void setNestedScrollingEnabled(boolean enabled){
+        super.setNestedScrollingEnabled(enabled);
+        mChildHelper.setNestedScrollingEnabled(enabled);
+    }
+
+    @Override
+    public boolean isNestedScrollingEnabled(){
+        return mChildHelper.isNestedScrollingEnabled();
+    }
+
+    @Override
+    public boolean startNestedScroll(int axes){
+        return mChildHelper.startNestedScroll(axes);
+    }
+
+    @Override
+    public void stopNestedScroll(){
+        mChildHelper.stopNestedScroll();
+    }
+
+    @Override
+    public boolean hasNestedScrollingParent(){
+        return mChildHelper.hasNestedScrollingParent();
+    }
+
+    @Override
+    public boolean dispatchNestedScroll(int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed, int[] offsetInWindow){
+        return mChildHelper.dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, offsetInWindow);
+    }
+
+    @Override
+    public boolean dispatchNestedPreScroll(int dx, int dy, int[] consumed, int[] offsetInWindow){
+        return mChildHelper.dispatchNestedPreScroll(dx, dy, consumed, offsetInWindow);
+    }
+
+    @Override
+    public boolean dispatchNestedFling(float velocityX, float velocityY, boolean consumed){
+        return mChildHelper.dispatchNestedFling(velocityX, velocityY, consumed);
+    }
+
+    @Override
+    public boolean dispatchNestedPreFling(float velocityX, float velocityY){
+        return mChildHelper.dispatchNestedPreFling(velocityX, velocityY);
+    }
+
+
+    public LoopImagePager setAutoLoop(boolean autoLoop){
+        mAutoLoop = autoLoop;
+        return this;
+    }
+
+    public LoopImagePager asNormalViewpager(){
+        setPadding(0, 0, 0, 0);
+        return this;
+    }
+
+    public class ImagePagerAdapter extends PagerAdapter {
         private List<String> mPagerData;
         private onLoopImageClickListener mL;
+//        private SparseArray<ImageView> mIvCache = new SparseArray<>();
+
+        private ImageView getIvByPosition(int position){
+            final int realPosition = getRealPosition(position);
+            //            ImageView imageView = mIvCache.get(realPosition);
+            //            if(imageView == null) {
+            final JDimImageView imageView = new JDimImageView(LibApp.getContext());
+            imageView.setImgRadius(mImageRoundRaidus);
+            imageView.clipTransform = true;
+            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
+                imageView.setElevation(DpHelper.dp2px(8));
+            }
+            imageView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v){
+                    if(null != mL) {
+                        //                            mL.onItemClickd(imageView, imageView, realPosition);
+                        mL.onItemClickd(LoopImagePager.this, imageView, realPosition);
+                    }
+                }
+            });
+            PicHelper.loadImage(mPagerData.get(realPosition), imageView);
+            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            //                mIvCache.append(position, imageView);
+            //            }
+            return imageView;
+        }
+
+        private int getRealPosition(int position){
+            return position%( mPagerData.size() );
+        }
 
         public ImagePagerAdapter(List<String> pagerData){
             mPagerData = pagerData;
@@ -188,25 +343,8 @@ public class LoopImagePager extends RelativeLayout {
 
         @Override
         public Object instantiateItem(ViewGroup container, final int position){
-            ImageView imageView = new ImageView(container.getContext());
-            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
-                imageView.setElevation(DpHelper.dp2px(8));
-            }
-            imageView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v){
-                    if(null != mL) {
-                        mL.onItemClickd(position%( mPagerData.size() ));
-                    }
-                }
-            });
-            int size = mPagerData.size();
-            if(size>0) {
-                Picasso.with(container.getContext()).load(mPagerData.get(position%size)).into(imageView);
-                //                Picasso.with(getContext()).load(R.mipmap.ic_launcher).into(imageView);
-                imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-                container.addView(imageView);
-            }
+            View imageView = getIvByPosition(( position ));
+            container.addView(imageView);
             return imageView;
         }
 
@@ -223,6 +361,11 @@ public class LoopImagePager extends RelativeLayout {
         public void setOnitemClickListener(onLoopImageClickListener l){
             mL = l;
         }
+
+        @Override
+        public int getItemPosition(Object object){
+            return POSITION_NONE;
+        }
     }
 
     public void setOnPagerItemClickListener(onLoopImageClickListener l){
@@ -233,7 +376,7 @@ public class LoopImagePager extends RelativeLayout {
     }
 
     public interface onLoopImageClickListener {
-        void onItemClickd(int Position);
+        void onItemClickd(LoopImagePager view, ImageView imageView, int Position);
     }
 
 
@@ -262,30 +405,41 @@ public class LoopImagePager extends RelativeLayout {
         }
     }
 
-    class MzTransformer implements ViewPager.PageTransformer {
+    static class MzTransformer implements ViewPager.PageTransformer {
         private static final float MIN_SCALE = 0.9F;
 
         @Override
         public void transformPage(View page, float position){
-
-            if(position<-1) {
+            //            position == [0,1] ：当前界面位于屏幕中心的时候
+            //            position == [1,Infinity] ：当前Page刚好滑出屏幕右侧
+            //            position ==[-Infinity,-1] ：当前Page刚好滑出屏幕左侧
+            if(position<-1) {// [-Infinity,-1)
+                // This page is way off-screen to the left. 当前Page刚好滑出屏幕左侧
+                page.setScaleX(MIN_SCALE+0.04f);
                 page.setScaleY(MIN_SCALE);
             }else if(position<=1) {
-                //
                 float scale = Math.max(MIN_SCALE, 1-Math.abs(position));
+                float scalex = Math.max(MIN_SCALE+0.04f, 1-Math.abs(position));
                 page.setScaleY(scale);
-            /*page.setScaleX(scale);
-
-            if(position<0){
-                page.setTranslationX(width * (1 - scale) /2);
-            }else{
-                page.setTranslationX(-width * (1 - scale) /2);
-            }*/
-
-            }else {
+                page.setScaleX(scalex);
+            }else {// (1,+Infinity]
+                // This page is way off-screen to the right.当前Page刚好滑出屏幕右侧
+                page.setScaleX(MIN_SCALE+0.04f);
                 page.setScaleY(MIN_SCALE);
             }
         }
 
+    }
+
+    public int getCurrentPosition(){
+        if(mViewPager != null) {
+            return mViewPager.getCurrentItem();
+        }else {
+            return 0;
+        }
+    }
+
+    public ViewPager getViewpager(){
+        return mViewPager;
     }
 }

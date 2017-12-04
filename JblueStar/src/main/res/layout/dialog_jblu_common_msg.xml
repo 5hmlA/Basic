@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="300dp"
+                android:layout_height="140dp"
+                android:background="@drawable/dialog_roundconor_bg"
+                android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/dialog_jblu_common_content"
+        android:layout_width="match_parent"
+        android:layout_height="92dp"
+        android:gravity="center"
+        android:textSize="15dp"/>
+
+    <View
+        android:id="@+id/dialog_line_"
+        android:layout_width="0.5dip"
+        android:layout_height="47dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@color/common_line">
+    </View>
+
+    <TextView
+        android:id="@+id/dialog_cancel"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/dialog_line_"
+        android:background="@drawable/selector_jforground"
+        android:gravity="center"
+        android:text="@string/dialog_cancel"
+        android:textColor="@color/colorAccent"
+        android:textSize="15dp"/>
+
+    <TextView
+        android:id="@+id/dialog_confirm"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/dialog_line_"
+        android:background="@drawable/selector_jforground"
+        android:gravity="center"
+        android:text="@string/dialog_confirm"
+        android:textColor="@color/gray999"
+        android:textSize="15dp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dip"
+        android:layout_above="@+id/dialog_confirm"
+        android:layout_centerHorizontal="true"
+        android:background="@color/common_line">
+    </View>
+</RelativeLayout>

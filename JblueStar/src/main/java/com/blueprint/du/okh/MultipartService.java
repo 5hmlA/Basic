@@ -23,7 +23,7 @@ public interface MultipartService {
 
 
 
-//    Ui/Image/uploadUnlimited.html
+//    Ui/Image/uploadUnlimited.HTML
     @GET
     @Streaming
     Flowable<ResponseBody> download(@Url String url);

@@ -64,4 +64,17 @@ public class DpHelper {
         windowManager.getDefaultDisplay().getMetrics(outMetrics);
         return outMetrics.heightPixels;
     }
+
+    public static int getStatusBarHeight() {
+        int statusHeight = -1;
+        try {
+            Class<?> clazz = Class.forName("com.android.internal.R$dimen");
+            Object object = clazz.newInstance();
+            int height = Integer.parseInt(clazz.getField("status_bar_height").get(object).toString());
+            statusHeight = LibApp.getContext().getResources().getDimensionPixelSize(height);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return statusHeight;
+    }
 }

@@ -15,6 +15,10 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.blueprint.R;
+import com.blueprint.helper.interf.DragSwipeAdapter;
+import com.blueprint.helper.interf.OnMoreloadListener;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -73,7 +77,7 @@ public abstract class AwesCardRecvAdapter<T> extends RecyclerView.Adapter<Recycl
                 super.onScrolled(recyclerView, dx, dy);
                 if(!ViewCompat.canScrollVertically(recv, 1) && mLoadmoreitem == 1) {
                     if(mListener != null) {
-                        mListener.onLoadingMore();
+                        mListener.onup2LoadingMore();
                     }
                 }
             }
@@ -150,6 +154,14 @@ public abstract class AwesCardRecvAdapter<T> extends RecyclerView.Adapter<Recycl
         }
     }
 
+
+    @Override
+    public void onBindViewHolder(final RecyclerHolder holder, int position,List<Object> payloads){
+        if(position<mAwesCards.size()) {
+            mAwesCards.get(position).holderConvert(holder, position);
+        }
+    }
+
     /**
      * 设置每页显示的数量
      *
@@ -175,7 +187,7 @@ public abstract class AwesCardRecvAdapter<T> extends RecyclerView.Adapter<Recycl
                 mLoadingHolder.setText(com.blueprint.R.id.recyc_item_tv_loadmore,
                         mContext.getString(com.blueprint.R.string.jonas_recyc_loading_more));
                 if(mListener != null && mLoadmoreitem == 1) {
-                    mListener.onLoadingMore();
+                    mListener.onup2LoadingMore();
                 }
             }
         }
@@ -199,13 +211,6 @@ public abstract class AwesCardRecvAdapter<T> extends RecyclerView.Adapter<Recycl
         mLoadmoreitem = 0;
         notifyDataSetChanged();
         return this;
-    }
-
-    public interface OnMoreloadListener {
-        /**
-         * 发起请求 加载更多数据
-         */
-        void onLoadingMore();
     }
 
     public AwesCardRecvAdapter setOnMoreloadListener(OnMoreloadListener listener){
@@ -268,7 +273,7 @@ public abstract class AwesCardRecvAdapter<T> extends RecyclerView.Adapter<Recycl
         if(actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
             View child = ( (ViewGroup)viewHolder.itemView ).getChildAt(0);
             if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
-                viewHolder.itemView.setTag(child.getElevation());
+                viewHolder.itemView.setTag(R.id.jblue_adapter_elevate_tag,child.getElevation());
                 ViewCompat.setElevation(child,6);
             }
         }
@@ -280,10 +285,10 @@ public abstract class AwesCardRecvAdapter<T> extends RecyclerView.Adapter<Recycl
             slog_e(TAG, "上拉加载提示holder不可以拖动滑动 ");
             return;
         }
-        if(viewHolder.itemView.getTag() != null) {
+        if(viewHolder.itemView.getTag(R.id.jblue_adapter_elevate_tag) != null) {
             View child = ( (ViewGroup)viewHolder.itemView ).getChildAt(0);
             if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
-                ViewCompat.setElevation(child,( (Float)viewHolder.itemView.getTag() ));
+                ViewCompat.setElevation(child,( (Float)viewHolder.itemView.getTag(R.id.jblue_adapter_elevate_tag) ));
             }
         }
     }
